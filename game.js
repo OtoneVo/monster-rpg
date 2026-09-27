@@ -1344,7 +1344,7 @@
     const has = N.party.length > 0;
     if (ui.sub === 'new1' || ui.sub === 'new2') {
       const q = ui.sub === 'new1' ? 'いまの 冒険の 記録を 消して はじめから 遊びますか？' : 'ほんとうに 消しますか？ もとには 戻せません。';
-      return pane(`<div class="sheet note" style="font-size:var(--fs)">${q}</div><div class="grid g2">
+      return pane(`<div class="sheet" style="font-size:var(--fs)">${q}</div><div class="grid g2">
         <button class="btn big fight cmd" data-a="newyes">はい</button><button class="btn big run cmd" data-a="back">いいえ</button></div>`, 'title-bg');
     }
     if (!has) {

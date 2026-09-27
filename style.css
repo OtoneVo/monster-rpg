@@ -206,4 +206,4 @@ button { font-family: inherit; color: inherit; }
 .name-in:focus { outline: none; box-shadow: 0 0 0 3px #e0a020; }
 .name-err { color: #c02030; }
 .title-bg .name-err { color: #ffb0b8; }
-.title-bg .sheet .note { color: #3a4a5a; }
+.title-bg .sheet.note, .title-bg .sheet .note { color: #3a4a5a; }

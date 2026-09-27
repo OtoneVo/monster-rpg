@@ -1,0 +1,1 @@
+["web_server.py", "web_local.py", "mrpg/__init__.py", "mrpg/battle.py", "mrpg/data.py", "mrpg/game.py", "mrpg/logger.py", "mrpg/monster.py", "mrpg/render.py", "mrpg/rng.py", "data/areas.json", "data/config.json", "data/items.json", "data/moves.json", "data/natures.json", "data/species.json", "data/trainers.json", "data/types.json"]

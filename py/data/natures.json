@@ -1,0 +1,30 @@
+{
+  "_note": "up/down は 1.1倍/0.9倍になる能力。null は無補正",
+  "natures": [
+    {"name": "ひたむき", "up": null,  "down": null},
+    {"name": "いじっぱり", "up": "atk", "down": "spa"},
+    {"name": "あばれんぼ", "up": "atk", "down": "def"},
+    {"name": "むこうみず", "up": "atk", "down": "spd"},
+    {"name": "せっかち",   "up": "atk", "down": "spe"},
+    {"name": "おだやか",   "up": null,  "down": null},
+    {"name": "がまんづよい", "up": "def", "down": "atk"},
+    {"name": "のんびりや", "up": "def", "down": "spe"},
+    {"name": "しっかりもの", "up": "def", "down": "spa"},
+    {"name": "おおらか",   "up": "def", "down": "spd"},
+    {"name": "まっすぐ",   "up": null,  "down": null},
+    {"name": "ものしり",   "up": "spa", "down": "atk"},
+    {"name": "ゆめみがち", "up": "spa", "down": "def"},
+    {"name": "うっかりや", "up": "spa", "down": "spd"},
+    {"name": "ひかえめ",   "up": "spa", "down": "spe"},
+    {"name": "きまぐれ",   "up": null,  "down": null},
+    {"name": "やさしい",   "up": "spd", "down": "atk"},
+    {"name": "おちつき",   "up": "spd", "down": "def"},
+    {"name": "しんちょう", "up": "spd", "down": "spa"},
+    {"name": "おもいやり", "up": "spd", "down": "spe"},
+    {"name": "すなお",     "up": null,  "down": null},
+    {"name": "はやとちり", "up": "spe", "down": "atk"},
+    {"name": "かろやか",   "up": "spe", "down": "def"},
+    {"name": "ようき",     "up": "spe", "down": "spa"},
+    {"name": "おてんば",   "up": "spe", "down": "spd"}
+  ]
+}

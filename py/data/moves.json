@@ -1,0 +1,98 @@
+{
+  "_note": "cat: phys=物理 spec=特殊 status=変化 / acc: null は必中 / effects.kind: status, confuse, stat, weather, heal / stat の target: self|foe",
+  "moves": {
+    "tackle":      {"name": "たいあたり",   "type": "獣", "cat": "phys", "power": 40, "acc": 100, "pp": 35},
+    "scratch":     {"name": "ひっかく",     "type": "獣", "cat": "phys", "power": 40, "acc": 100, "pp": 35},
+    "quickstep":   {"name": "はやわざ",     "type": "獣", "cat": "phys", "power": 40, "acc": 100, "pp": 30, "priority": 1},
+    "rush":        {"name": "とっしん",     "type": "獣", "cat": "phys", "power": 90, "acc": 85, "pp": 20},
+    "glare":       {"name": "にらむ",       "type": "獣", "cat": "status", "power": 0, "acc": 100, "pp": 30, "effects": [{"kind": "stat", "target": "foe", "stats": {"def": -1}}]},
+    "growl":       {"name": "なきごえ",     "type": "獣", "cat": "status", "power": 0, "acc": 100, "pp": 40, "effects": [{"kind": "stat", "target": "foe", "stats": {"atk": -1}}]},
+    "dash":        {"name": "かけあし",     "type": "獣", "cat": "status", "power": 0, "acc": null, "pp": 30, "effects": [{"kind": "stat", "target": "self", "stats": {"spe": 2}}]},
+    "rest_breath": {"name": "ひとやすみ",   "type": "獣", "cat": "status", "power": 0, "acc": null, "pp": 10, "effects": [{"kind": "heal", "ratio": 0.5}]},
+
+    "zap":         {"name": "ピリッと",     "type": "雷", "cat": "spec", "power": 40, "acc": 100, "pp": 30, "effects": [{"kind": "status", "status": "paralysis", "chance": 10}]},
+    "numb_needle": {"name": "しびれ針",     "type": "雷", "cat": "status", "power": 0, "acc": 90, "pp": 20, "effects": [{"kind": "status", "status": "paralysis", "chance": 100}]},
+    "bolt_run":    {"name": "いなずま走り", "type": "雷", "cat": "phys", "power": 65, "acc": 100, "pp": 20, "effects": [{"kind": "status", "status": "paralysis", "chance": 10}]},
+    "thunder_pillar": {"name": "かみなり柱", "type": "雷", "cat": "spec", "power": 90, "acc": 100, "pp": 15, "effects": [{"kind": "status", "status": "paralysis", "chance": 10}]},
+    "storm_cloud": {"name": "放電雲",       "type": "雷", "cat": "spec", "power": 110, "acc": 70, "pp": 10, "effects": [{"kind": "status", "status": "paralysis", "chance": 30}]},
+
+    "breeze":      {"name": "そよかぜ",     "type": "風", "cat": "spec", "power": 40, "acc": 100, "pp": 35},
+    "whirl_strike":{"name": "つむじ打ち",   "type": "風", "cat": "phys", "power": 60, "acc": 100, "pp": 25},
+    "sickle_wind": {"name": "かまいたち",   "type": "風", "cat": "spec", "power": 75, "acc": 95, "pp": 15, "crit": 1},
+    "tailwind_up": {"name": "おいかぜ",     "type": "風", "cat": "status", "power": 0, "acc": null, "pp": 20, "effects": [{"kind": "stat", "target": "self", "stats": {"spe": 2}}]},
+    "gale":        {"name": "暴風",         "type": "風", "cat": "spec", "power": 110, "acc": 70, "pp": 10, "effects": [{"kind": "confuse", "chance": 30}]},
+
+    "wisp":        {"name": "ひとだま",     "type": "霊", "cat": "spec", "power": 40, "acc": 100, "pp": 30},
+    "spook":       {"name": "おどろかし",   "type": "霊", "cat": "phys", "power": 45, "acc": 100, "pp": 25},
+    "grudge_voice":{"name": "うらみ声",     "type": "霊", "cat": "status", "power": 0, "acc": 100, "pp": 20, "effects": [{"kind": "stat", "target": "foe", "stats": {"spa": -1, "spd": -1}}]},
+    "bewitch":     {"name": "まどわし",     "type": "霊", "cat": "status", "power": 0, "acc": 75, "pp": 15, "effects": [{"kind": "confuse", "chance": 100}]},
+    "spirit_blast":{"name": "霊撃",         "type": "霊", "cat": "spec", "power": 80, "acc": 100, "pp": 15, "effects": [{"kind": "stat", "target": "foe", "stats": {"spd": -1}, "chance": 20}]},
+    "curse_flame": {"name": "たたり火",     "type": "霊", "cat": "spec", "power": 65, "acc": 100, "pp": 15, "effects": [{"kind": "status", "status": "burn", "chance": 10}]},
+
+    "leaf_blade":  {"name": "はっぱ手裏剣", "type": "樹", "cat": "phys", "power": 55, "acc": 95, "pp": 25, "crit": 1},
+    "vine_lash":   {"name": "つるむち",     "type": "樹", "cat": "phys", "power": 45, "acc": 100, "pp": 25},
+    "sleep_pollen":{"name": "ねむり花粉",   "type": "樹", "cat": "status", "power": 0, "acc": 75, "pp": 15, "effects": [{"kind": "status", "status": "sleep", "chance": 100}]},
+    "forest_breath": {"name": "森のいぶき", "type": "樹", "cat": "spec", "power": 90, "acc": 100, "pp": 10},
+
+    "water_shot":  {"name": "みずでっぽう", "type": "水", "cat": "spec", "power": 40, "acc": 100, "pp": 25},
+    "whirlpool":   {"name": "うずしお",     "type": "水", "cat": "spec", "power": 80, "acc": 100, "pp": 15},
+    "wave_crash":  {"name": "波がしら",     "type": "水", "cat": "phys", "power": 70, "acc": 95, "pp": 15},
+    "call_rain":   {"name": "雨呼び",       "type": "水", "cat": "status", "power": 0, "acc": null, "pp": 5, "effects": [{"kind": "weather", "weather": "rain"}]},
+
+    "ember":       {"name": "ひのこ",       "type": "火", "cat": "spec", "power": 40, "acc": 100, "pp": 25, "effects": [{"kind": "status", "status": "burn", "chance": 10}]},
+    "flame_wheel": {"name": "かえん輪",     "type": "火", "cat": "phys", "power": 60, "acc": 100, "pp": 25, "effects": [{"kind": "status", "status": "burn", "chance": 10}]},
+    "scorch":      {"name": "やけど火",     "type": "火", "cat": "status", "power": 0, "acc": 85, "pp": 15, "effects": [{"kind": "status", "status": "burn", "chance": 100}]},
+    "call_sun":    {"name": "日照り呼び",   "type": "火", "cat": "status", "power": 0, "acc": null, "pp": 5, "effects": [{"kind": "weather", "weather": "sun"}]},
+    "blaze":       {"name": "大文字焼き",   "type": "火", "cat": "spec", "power": 90, "acc": 100, "pp": 15, "effects": [{"kind": "status", "status": "burn", "chance": 10}]},
+
+    "pebble":      {"name": "いしつぶて",   "type": "岩", "cat": "phys", "power": 50, "acc": 90, "pp": 15},
+    "rockslide":   {"name": "岩なだれ",     "type": "岩", "cat": "phys", "power": 75, "acc": 90, "pp": 10},
+    "harden":      {"name": "かたくなる",   "type": "岩", "cat": "status", "power": 0, "acc": null, "pp": 30, "effects": [{"kind": "stat", "target": "self", "stats": {"def": 1}}]},
+    "call_sand":   {"name": "砂嵐呼び",     "type": "岩", "cat": "status", "power": 0, "acc": null, "pp": 5, "effects": [{"kind": "weather", "weather": "sand"}]},
+
+    "powder_snow": {"name": "こなゆき",     "type": "氷", "cat": "spec", "power": 40, "acc": 100, "pp": 25, "effects": [{"kind": "status", "status": "freeze", "chance": 10}]},
+    "icicle":      {"name": "つららばり",   "type": "氷", "cat": "phys", "power": 65, "acc": 100, "pp": 20},
+    "call_snow":   {"name": "雪呼び",       "type": "氷", "cat": "status", "power": 0, "acc": null, "pp": 5, "effects": [{"kind": "weather", "weather": "snow"}]},
+
+    "bug_bite":    {"name": "むしくい",     "type": "虫", "cat": "phys", "power": 45, "acc": 100, "pp": 25},
+    "string_shot": {"name": "いとはき",     "type": "虫", "cat": "status", "power": 0, "acc": 95, "pp": 40, "effects": [{"kind": "stat", "target": "foe", "stats": {"spe": -2}}]},
+    "buzz":        {"name": "虫の羽音",     "type": "虫", "cat": "spec", "power": 80, "acc": 100, "pp": 10, "effects": [{"kind": "stat", "target": "foe", "stats": {"spd": -1}, "chance": 10}]},
+
+    "poison_sting":{"name": "どくばり",     "type": "毒", "cat": "phys", "power": 35, "acc": 100, "pp": 35, "effects": [{"kind": "status", "status": "poison", "chance": 30}]},
+    "toxic_mist":  {"name": "猛毒霧",       "type": "毒", "cat": "status", "power": 0, "acc": 90, "pp": 10, "effects": [{"kind": "status", "status": "toxic", "chance": 100}]},
+    "sludge":      {"name": "ヘドロ弾",     "type": "毒", "cat": "spec", "power": 85, "acc": 100, "pp": 10, "effects": [{"kind": "status", "status": "poison", "chance": 30}]},
+
+    "iron_claw":   {"name": "鉄の爪",       "type": "金", "cat": "phys", "power": 50, "acc": 95, "pp": 35, "effects": [{"kind": "stat", "target": "self", "stats": {"atk": 1}, "chance": 10}]},
+    "jiryokudan":  {"name": "じりょくだん",   "type": "金", "cat": "spec", "power": 50, "acc": 100, "pp": 25},
+    "rust_beam":   {"name": "錆び光線",     "type": "金", "cat": "spec", "power": 80, "acc": 100, "pp": 10},
+
+    "shard":       {"name": "結晶片",       "type": "晶", "cat": "phys", "power": 45, "acc": 100, "pp": 30},
+    "prism":       {"name": "プリズム光",   "type": "晶", "cat": "spec", "power": 80, "acc": 100, "pp": 15},
+    "crystal_guard": {"name": "結晶の守り", "type": "晶", "cat": "status", "power": 0, "acc": null, "pp": 20, "effects": [{"kind": "stat", "target": "self", "stats": {"def": 1, "spd": 1}}]},
+
+    "whisper_song":{"name": "ささやき歌",   "type": "音", "cat": "spec", "power": 40, "acc": 100, "pp": 30},
+    "lullaby":     {"name": "子守唄",       "type": "音", "cat": "status", "power": 0, "acc": 55, "pp": 15, "effects": [{"kind": "status", "status": "sleep", "chance": 100}]},
+    "resonance":   {"name": "共鳴波",       "type": "音", "cat": "spec", "power": 90, "acc": 100, "pp": 10},
+
+    "doze":        {"name": "まどろみ",     "type": "夢", "cat": "spec", "power": 50, "acc": 100, "pp": 25, "effects": [{"kind": "status", "status": "sleep", "chance": 10}]},
+    "illusion":    {"name": "幻惑",         "type": "夢", "cat": "status", "power": 0, "acc": 90, "pp": 15, "effects": [{"kind": "confuse", "chance": 100}]},
+    "dream_wave":  {"name": "夢の波",       "type": "夢", "cat": "spec", "power": 85, "acc": 100, "pp": 10},
+
+    "kick":        {"name": "けりつけ",     "type": "武", "cat": "phys", "power": 50, "acc": 100, "pp": 30},
+    "straight_punch": {"name": "正拳",      "type": "武", "cat": "phys", "power": 80, "acc": 100, "pp": 15},
+    "focus_up":    {"name": "気合い溜め",   "type": "武", "cat": "status", "power": 0, "acc": null, "pp": 20, "effects": [{"kind": "stat", "target": "self", "stats": {"atk": 2}}]},
+
+    "old_words":   {"name": "古びた言葉",   "type": "古", "cat": "spec", "power": 50, "acc": 100, "pp": 25},
+    "time_stone":  {"name": "時の礫",       "type": "古", "cat": "phys", "power": 80, "acc": 95, "pp": 15},
+
+    "haze_shot":   {"name": "かすみ撃ち",   "type": "霧", "cat": "spec", "power": 55, "acc": 100, "pp": 25},
+    "call_fog":    {"name": "霧呼び",       "type": "霧", "cat": "status", "power": 0, "acc": null, "pp": 5, "effects": [{"kind": "weather", "weather": "fog"}]},
+    "oblivion_mist": {"name": "忘却の霧",   "type": "霧", "cat": "spec", "power": 90, "acc": 100, "pp": 10, "effects": [{"kind": "confuse", "chance": 20}]},
+
+    "light_arrow": {"name": "ひかりの矢",   "type": "光", "cat": "spec", "power": 60, "acc": 100, "pp": 25},
+    "flash":       {"name": "閃光",         "type": "光", "cat": "status", "power": 0, "acc": 100, "pp": 20, "effects": [{"kind": "stat", "target": "foe", "stats": {"acc": -1}}]},
+
+    "shadow_sneak":{"name": "かげうち",     "type": "闇", "cat": "phys", "power": 40, "acc": 100, "pp": 30, "priority": 1},
+    "dark_fang":   {"name": "闇の牙",       "type": "闇", "cat": "phys", "power": 80, "acc": 100, "pp": 15}
+  }
+}

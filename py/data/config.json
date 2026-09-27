@@ -1,0 +1,41 @@
+{
+  "_note": "数値はすべて要調整。index = 所持メダル数",
+  "medals": {
+    "order_boss_level": [12, 18, 24, 30, 36, 42, 48, 54],
+    "level_cap":        [12, 18, 24, 30, 36, 42, 50, 58, 66],
+    "field_floor_step": 3
+  },
+  "obey": {
+    "_note": "上限超過レベルごとの言うことを聞かない確率(%)。band: [超過下限, 超過上限, 確率下限, 確率上限]",
+    "bands": [[1, 5, 10, 30], [6, 10, 30, 60], [11, 20, 60, 90]],
+    "over_21_obey_in_65536": 3
+  },
+  "exp": {
+    "scale": 2.0,
+    "trainer_bonus": 1.5,
+    "_level_diff_note": "diff = 相手Lv - 自分Lv。格上は +10%/Lv(最大+100%)、-2〜0は等倍、それ以下は0.7倍ずつ減衰、-10以下は0.01",
+    "up_per_level": 0.1,
+    "up_max": 2.0,
+    "down_free": 2,
+    "down_decay": 0.7,
+    "down_floor_diff": 10,
+    "down_floor": 0.01
+  },
+  "capture": {
+    "_note": "確率 = 捕獲率/255 × HP補正 × 状態補正 × 籠補正 × Lv差補正 × メダル補正、下限 min",
+    "hp_top": 1.5,
+    "medal_base": 0.2,
+    "medal_step": 0.1,
+    "min": 0.01,
+    "status": {"sleep": 2.5, "freeze": 2.5, "paralysis": 1.5, "poison": 1.5, "toxic": 1.5, "burn": 1.5}
+  },
+  "battle": {"legend_watch_turns": 2, "dream_sleep_resist_percent": 50, "weather_turns": 5,
+             "trainer_ai_random_percent": 20, "confuse_self_percent": 33},
+  "starter_items": {"musubi": 5, "dango": 3},
+  "encounter_rate": 6554,
+  "shiny_in_65536": 16,
+  "time": {"steps_per_phase": 80, "phases": ["朝", "昼", "夜"]},
+  "stuck": {"same_area_actions": 30, "no_progress_actions": 150},
+  "whiteout_money_ratio": 0.5,
+  "start": {"area": "tsumugi", "x": 9, "y": 6, "money": 3000}
+}

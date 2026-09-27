@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="モンスターRPG">
+<meta name="theme-color" content="#1c1f2b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<link rel="stylesheet" href="style.css">
+<title>モンスターRPG</title>
+</head>
+<body>
+<div id="ds">
+  <div class="shell top-shell">
+    <div class="bezel">
+      <canvas id="top" aria-label="上画面"></canvas>
+    </div>
+  </div>
+  <div class="hinge"><span></span><span></span></div>
+  <div class="shell bottom-shell">
+    <div class="bezel">
+      <div id="panel" class="screen2" aria-live="polite"></div>
+    </div>
+    <div class="controls">
+      <div class="dpad" id="dpad" aria-label="十字キー">
+        <button data-dir="up" class="d up" aria-label="上"></button>
+        <button data-dir="left" class="d left" aria-label="左"></button>
+        <span class="d mid"></span>
+        <button data-dir="right" class="d right" aria-label="右"></button>
+        <button data-dir="down" class="d down" aria-label="下"></button>
+      </div>
+      <div class="mini">
+        <button id="btnSound" class="pill" aria-label="サウンド">♪</button>
+        <button id="btnMenu" class="pill menu-pill" aria-label="メニュー">☰</button>
+      </div>
+      <div class="ab">
+        <button id="btnB" class="round b" aria-label="Bボタン">B</button>
+        <button id="btnA" class="round a" aria-label="Aボタン">A</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="bootnote" style="position:fixed;left:0;right:0;top:40%;text-align:center;color:#fff;font-family:DotGothic16,sans-serif;pointer-events:none;z-index:9"></div>
+<script src="local.js"></script>
+<script src="sprites.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

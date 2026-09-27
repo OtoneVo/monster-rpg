@@ -1,0 +1,14 @@
+{
+  "name": "モンスターRPG",
+  "short_name": "モンスターRPG",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1c1f2b",
+  "theme_color": "#1c1f2b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

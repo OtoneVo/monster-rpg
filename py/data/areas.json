@@ -1,0 +1,290 @@
+{
+  "_note": "地形: # 壁/木  . 道  , 草むら(出現)  : 洞窟の床(出現)  ~ 水(港のメダル)  R 岩(石のメダル)  T 茂み(森のメダル)。objects は地形の上に置くイベント。exit は踏むと移動、それ以外はぶつかると発生",
+  "world_map": {"_note": "たびの地図の配置 [列, 行]（行0が北）。つながりは出口から自動で作る", "towns": ["tsumugi", "ishi", "mori", "minato"],
+    "cells": {"minato": [3, 0], "ruins": [4, 0], "ishi": [1, 1], "cave": [2, 1], "route3": [3, 1], "route1": [1, 2], "route2": [2, 2], "mori": [3, 2], "tsumugi": [1, 3]}},
+  "areas": {
+    "tsumugi": {
+      "name": "ツムギ村", "cave": false, "weather": null, "encounters": [],
+      "map": [
+        "#########..#########",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "####################"
+      ],
+      "objects": [
+        {"x": 9,  "y": 0, "kind": "exit", "to": "route1", "tx": 5, "ty": 18, "label": "1番道路", "require_flag": "got_starter", "block_msg": "博士の声がする。『おーい、まだ外は危ないぞ！ 研究所に寄っていきなさい』"},
+        {"x": 10, "y": 0, "kind": "exit", "to": "route1", "tx": 6, "ty": 18, "label": "1番道路", "require_flag": "got_starter", "block_msg": "博士の声がする。『おーい、まだ外は危ないぞ！ 研究所に寄っていきなさい』"},
+        {"x": 4,  "y": 3, "kind": "lab", "label": "記録研究所"},
+        {"x": 14, "y": 3, "kind": "heal", "label": "休み処"},
+        {"x": 14, "y": 6, "kind": "shop", "shop": "basic", "label": "よろず屋"},
+        {"x": 6,  "y": 6, "kind": "npc", "label": "村の人", "text": "北の1番道路を抜けると石の街。東へそれると森の街へ続く道があるよ。どっちから行ってもいいんだってさ。"},
+        {"x": 16, "y": 7, "kind": "tablet", "id": "tablet_1", "label": "古い石碑", "text": "『はじめに 三つを 生んだものが あった。 その名は どこにも 刻まれていない。』"}
+      ]
+    },
+    "route1": {
+      "name": "1番道路", "cave": false, "weather": null,
+      "encounters": [
+        {"species": "mokonezu",  "min": 2, "max": 5, "weight": 29},
+        {"species": "hamimushi", "min": 2, "max": 5, "weight": 30},
+        {"species": "tobitsuba", "min": 3, "max": 5, "weight": 25},
+        {"species": "kokemaru",  "min": 3, "max": 5, "weight": 15},
+        {"species": "ishibumi",  "min": 55, "max": 60, "weight": 1}
+      ],
+      "map": [
+        "#####..#####",
+        "#..........#",
+        "#.,,,,..,,,#",
+        "#.,,,,..,,,#",
+        "#.,,,,.....#",
+        "#...........",
+        "#...........",
+        "#...,,,,...#",
+        "#...,,,,...#",
+        "#...,,,,...#",
+        "#..........#",
+        "#,,,....,,,#",
+        "#,,,....,,,#",
+        "#..........#",
+        "####....####",
+        "#..........#",
+        "#.,,,,,,,,.#",
+        "#.,,,,,,,,.#",
+        "#..........#",
+        "#####..#####"
+      ],
+      "objects": [
+        {"x": 5,  "y": 0,  "kind": "exit", "to": "ishi", "tx": 9,  "ty": 10, "label": "石の街"},
+        {"x": 6,  "y": 0,  "kind": "exit", "to": "ishi", "tx": 10, "ty": 10, "label": "石の街"},
+        {"x": 11, "y": 5,  "kind": "exit", "to": "route2", "tx": 1, "ty": 4, "label": "2番道路"},
+        {"x": 11, "y": 6,  "kind": "exit", "to": "route2", "tx": 1, "ty": 5, "label": "2番道路"},
+        {"x": 5,  "y": 19, "kind": "exit", "to": "tsumugi", "tx": 9,  "ty": 1, "label": "ツムギ村"},
+        {"x": 6,  "y": 19, "kind": "exit", "to": "tsumugi", "tx": 10, "ty": 1, "label": "ツムギ村"},
+        {"x": 8,  "y": 10, "kind": "trainer", "trainer": "bug_boy", "label": "虫取りの子"},
+        {"x": 2,  "y": 15, "kind": "trainer", "trainer": "hiker_1", "label": "旅の人"},
+        {"x": 8,  "y": 1,  "kind": "npc", "label": "看板", "text": "北 石の街 ／ 東 2番道路（森の街方面）"}
+      ]
+    },
+    "route2": {
+      "name": "2番道路", "cave": false, "weather": null,
+      "encounters": [
+        {"species": "tobitsuba", "min": 6, "max": 10, "weight": 25},
+        {"species": "mokonezu",  "min": 6, "max": 9,  "weight": 20},
+        {"species": "hamimushi", "min": 6, "max": 9,  "weight": 15},
+        {"species": "kokemaru",  "min": 7, "max": 10, "weight": 15},
+        {"species": "homurabi",  "min": 7, "max": 10, "weight": 10},
+        {"species": "rinneko",   "min": 7, "max": 10, "weight": 10},
+        {"species": "kageboshi", "min": 8, "max": 10, "weight": 8, "time": ["夜"]},
+        {"species": "hikaridama","min": 8, "max": 10, "weight": 8, "time": ["朝"]}
+      ],
+      "map": [
+        "####################",
+        "#..................#",
+        "#.,,,,,,....,,,,,..#",
+        "#.,,,,,,....,,,,,..#",
+        "....................",
+        "....................",
+        "#..,,,,......,,,,..#",
+        "####################"
+      ],
+      "objects": [
+        {"x": 0,  "y": 4, "kind": "exit", "to": "route1", "tx": 10, "ty": 5, "label": "1番道路"},
+        {"x": 0,  "y": 5, "kind": "exit", "to": "route1", "tx": 10, "ty": 6, "label": "1番道路"},
+        {"x": 19, "y": 4, "kind": "exit", "to": "mori", "tx": 1, "ty": 5, "label": "森の街"},
+        {"x": 19, "y": 5, "kind": "exit", "to": "mori", "tx": 1, "ty": 6, "label": "森の街"},
+        {"x": 17, "y": 6, "kind": "trainer", "trainer": "lass_1", "label": "花摘みの子"},
+        {"x": 10, "y": 1, "kind": "trainer", "trainer": "kiri_grunt_1", "label": "白い服の人", "show_if_medals": 1}
+      ]
+    },
+    "ishi": {
+      "name": "石の街", "cave": false, "weather": null, "encounters": [],
+      "arrive_gift": {"item": "maki_jiryokudan", "flag": "gift_ishi_jiryoku", "text": [
+        "石工『おっ、旅の人かい。道場のイワネに 挑むんだな？』",
+        "石工『岩を割るなら 鉄のノミだ。こいつは 磁力で 鉄を撃ちだす技の 巻物さ。持っていきな』"]},
+      "map": [
+        "####################",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#...................",
+        "#...................",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#########..#########"
+      ],
+      "objects": [
+        {"x": 9,  "y": 11, "kind": "exit", "to": "route1", "tx": 5, "ty": 1, "label": "1番道路"},
+        {"x": 10, "y": 11, "kind": "exit", "to": "route1", "tx": 6, "ty": 1, "label": "1番道路"},
+        {"x": 19, "y": 5,  "kind": "exit", "to": "cave", "tx": 1, "ty": 4, "label": "石の洞窟"},
+        {"x": 19, "y": 6,  "kind": "exit", "to": "cave", "tx": 1, "ty": 5, "label": "石の洞窟"},
+        {"x": 9,  "y": 2,  "kind": "gym", "town": "ishi", "label": "石の道場"},
+        {"x": 4,  "y": 4,  "kind": "heal", "label": "休み処"},
+        {"x": 15, "y": 4,  "kind": "shop", "shop": "ishi", "label": "石の街の店"},
+        {"x": 5,  "y": 8,  "kind": "npc", "label": "石工", "text": "道場の主イワネは岩の使い手だ。岩には 樹・水・武・金の技がよく効く。1番道路の草むらに出るコケマルは、はじめから つるむち（樹）を覚えてるぞ。雷や風の技は岩に通りにくいから、仲間をそろえて行きな。"},
+        {"x": 14, "y": 8,  "kind": "npc", "label": "坑夫", "text": "東の洞窟は奥で大岩にふさがれてる。石のメダルを持ってる人なら、あれを砕いて通れるらしい。"}
+      ]
+    },
+    "cave": {
+      "name": "石の洞窟", "cave": true, "weather": null,
+      "encounters": [
+        {"species": "gorokko",   "min": 10, "max": 14, "weight": 35},
+        {"species": "kirarisu",  "min": 11, "max": 15, "weight": 20},
+        {"species": "sabigane",  "min": 12, "max": 15, "weight": 15},
+        {"species": "kageboshi", "min": 11, "max": 15, "weight": 15},
+        {"species": "tsurarugi", "min": 11, "max": 15, "weight": 14},
+        {"species": "ishibumi",  "min": 58, "max": 62, "weight": 1}
+      ],
+      "map": [
+        "########################",
+        "#::::::::::#:::::::::::#",
+        "#::::::::::#:::::::::::#",
+        "#::::::::::R:::::::::::#",
+        ".::::::::::R:::::::::::.",
+        ".::::::::::#:::::::::::.",
+        "#::::::::::#:::::::::::#",
+        "#::::::::::#:::::::::::#",
+        "#::::::::::#:::::::::::#",
+        "########################"
+      ],
+      "objects": [
+        {"x": 0,  "y": 4, "kind": "exit", "to": "ishi", "tx": 18, "ty": 5, "label": "石の街"},
+        {"x": 0,  "y": 5, "kind": "exit", "to": "ishi", "tx": 18, "ty": 6, "label": "石の街"},
+        {"x": 23, "y": 4, "kind": "exit", "to": "route3", "tx": 1, "ty": 7, "label": "3番道路"},
+        {"x": 23, "y": 5, "kind": "exit", "to": "route3", "tx": 1, "ty": 8, "label": "3番道路"},
+        {"x": 5,  "y": 2, "kind": "trainer", "trainer": "hiker_2", "label": "山男"}
+      ]
+    },
+    "mori": {
+      "name": "森の街", "cave": false, "weather": null, "encounters": [],
+      "map": [
+        "#########..#########",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "...................#",
+        "...................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "####################"
+      ],
+      "objects": [
+        {"x": 0,  "y": 5, "kind": "exit", "to": "route2", "tx": 18, "ty": 4, "label": "2番道路"},
+        {"x": 0,  "y": 6, "kind": "exit", "to": "route2", "tx": 18, "ty": 5, "label": "2番道路"},
+        {"x": 9,  "y": 0, "kind": "exit", "to": "route3", "tx": 7, "ty": 12, "label": "3番道路"},
+        {"x": 10, "y": 0, "kind": "exit", "to": "route3", "tx": 8, "ty": 12, "label": "3番道路"},
+        {"x": 9,  "y": 4, "kind": "gym", "town": "mori", "label": "森の道場"},
+        {"x": 4,  "y": 8, "kind": "heal", "label": "休み処"},
+        {"x": 15, "y": 8, "kind": "shop", "shop": "mori", "label": "森の街の店"},
+        {"x": 14, "y": 3, "kind": "npc", "label": "木こり", "text": "北の3番道路は茂みで通れないよ。森のメダルがあれば切り開けるんだけどね。"},
+        {"x": 12, "y": 1, "kind": "npc", "label": "立て札", "sign": true, "text": "この先 3番道路。茂みの 向こうは 手強い トレーナーが 多い。仲間を 育ててから 進もう。"},
+        {"x": 6,  "y": 1, "kind": "npc", "label": "鈴守り",
+         "text": "鈴は バッグの たいせつなもの から 鳴らしたり 止めたり できるよ。",
+         "give": {"item": "wakeai_suzu", "flag": "got_wakeai_suzu", "need_medal": "mori",
+                  "text_before": "この鈴は 森のメダルを 持つ トレーナーに 渡すことに しているんだ。道場で 認めてもらったら また おいで。",
+                  "text_give": "森のメダル、見せてもらったよ。この わけあいの鈴を あげよう。鳴らしておけば 戦わなかった 仲間にも 経験値が 分けられる。"}}
+      ]
+    },
+    "route3": {
+      "name": "3番道路", "cave": false, "weather": null,
+      "encounters": [
+        {"species": "dokunuma",  "min": 14, "max": 18, "weight": 25},
+        {"species": "minamochi", "min": 14, "max": 18, "weight": 25},
+        {"species": "tobitsuba", "min": 14, "max": 18, "weight": 20},
+        {"species": "hamiragi",  "min": 15, "max": 18, "weight": 15},
+        {"species": "rinneko",   "min": 15, "max": 19, "weight": 10},
+        {"species": "homurabi",  "min": 15, "max": 19, "weight": 5}
+      ],
+      "map": [
+        "#######..#######",
+        "#..............#",
+        "#.,,,,,..,,,,,.#",
+        "#.,,,,,..,,,,,.#",
+        "#..............#",
+        "#~~~~......~~~~#",
+        "#~~~~......~~~~#",
+        "...............#",
+        "...............#",
+        "#..,,,,,,,,,,..#",
+        "#..,,,,,,,,,,..#",
+        "#######TT#######",
+        "#######..#######",
+        "#######..#######"
+      ],
+      "objects": [
+        {"x": 7, "y": 0,  "kind": "exit", "to": "minato", "tx": 9,  "ty": 10, "label": "港の街"},
+        {"x": 8, "y": 0,  "kind": "exit", "to": "minato", "tx": 10, "ty": 10, "label": "港の街"},
+        {"x": 0, "y": 7,  "kind": "exit", "to": "cave", "tx": 22, "ty": 4, "label": "石の洞窟"},
+        {"x": 0, "y": 8,  "kind": "exit", "to": "cave", "tx": 22, "ty": 5, "label": "石の洞窟"},
+        {"x": 7, "y": 13, "kind": "exit", "to": "mori", "tx": 9,  "ty": 1, "label": "森の街"},
+        {"x": 8, "y": 13, "kind": "exit", "to": "mori", "tx": 10, "ty": 1, "label": "森の街"},
+        {"x": 12, "y": 4, "kind": "trainer", "trainer": "fisher_1", "label": "釣り人"},
+        {"x": 3,  "y": 8, "kind": "trainer", "trainer": "kiri_grunt_2", "label": "白い服の人", "show_if_medals": 2}
+      ]
+    },
+    "minato": {
+      "name": "港の街", "cave": false, "weather": null, "encounters": [],
+      "map": [
+        "####################",
+        "#..............~~~~#",
+        "#..............~~~~#",
+        "#..............~~~~#",
+        "#..............~~~~.",
+        "#..............~~~~#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#########..#########"
+      ],
+      "objects": [
+        {"x": 9,  "y": 11, "kind": "exit", "to": "route3", "tx": 7, "ty": 1, "label": "3番道路"},
+        {"x": 10, "y": 11, "kind": "exit", "to": "route3", "tx": 8, "ty": 1, "label": "3番道路"},
+        {"x": 19, "y": 4,  "kind": "exit", "to": "ruins", "tx": 1, "ty": 4, "label": "忘れ岬"},
+        {"x": 7,  "y": 2,  "kind": "gym", "town": "minato", "label": "港の道場"},
+        {"x": 3,  "y": 7,  "kind": "heal", "label": "休み処"},
+        {"x": 12, "y": 7,  "kind": "shop", "shop": "minato", "label": "港の市場"},
+        {"x": 13, "y": 4,  "kind": "npc", "label": "船乗り", "text": "東の海の先に忘れ岬って遺跡がある。港のメダルがあれば渡れるさ。最近あそこには白い服の連中がうろついてるって話だ。"}
+      ]
+    },
+    "ruins": {
+      "name": "忘れ岬の遺跡", "cave": false, "weather": "fog",
+      "encounters": [
+        {"species": "yumetsubaki", "min": 20, "max": 25, "weight": 35},
+        {"species": "sabigane",    "min": 20, "max": 25, "weight": 25},
+        {"species": "hikaridama",  "min": 20, "max": 24, "weight": 20},
+        {"species": "minamoruga",  "min": 22, "max": 26, "weight": 15},
+        {"species": "ishibumi",    "min": 60, "max": 64, "weight": 5}
+      ],
+      "map": [
+        "##############",
+        "#............#",
+        "#.,,,,..,,,,.#",
+        "#.,,,,..,,,,.#",
+        ".............#",
+        "#............#",
+        "#.,,,,..,,,,.#",
+        "#.,,,,..,,,,.#",
+        "#............#",
+        "##############"
+      ],
+      "objects": [
+        {"x": 0,  "y": 4, "kind": "exit", "to": "minato", "tx": 18, "ty": 4, "label": "港の街"},
+        {"x": 6,  "y": 1, "kind": "tablet", "id": "tablet_2", "label": "崩れかけた石碑", "text": "『刻むものは すべてを 残そうとした。 霞むものは すべてを 流そうとした。』"},
+        {"x": 12, "y": 4, "kind": "tablet", "id": "tablet_3", "label": "苔むした石碑", "text": "『結ぶものが 両の手を とり 世界は 石にも 霧にも ならずに すんだ。』"},
+        {"x": 6,  "y": 8, "kind": "tablet", "id": "tablet_4", "label": "新しく削られた跡のある石碑", "text": "『忘れることを 恐れた者が いた。 その者は 記録の 番人を 名乗った。』 …石碑の一部は最近削り取られたようだ。"}
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "_note": "boss の party は [種族, 基準Lvからの差]。基準Lv = config.medals.order_boss_level[挑戦時の所持メダル数]",
+  "trainers": {
+    "rival_1": {"name": "ライバルのカナタ", "money": 300, "intro": "カナタ『待ってました！ 相棒を 選んだなら 勝負だ！ 博士、見ててくれよな！』", "lose": "カナタ『くっそー！ 次は負けないからな！』",
+                "moves_upto_level": 1, "party_by_starter": {"pirit": [["yurabi", 5]], "soyoka": [["pirit", 5]], "yurabi": [["soyoka", 5]]}},
+    "bug_boy":  {"name": "虫取りのタロウ", "money": 120, "intro": "タロウ『草むらの虫はぜんぶ友だち！ 勝負だ！』", "lose": "タロウ『ぼくの虫たちがー！』",
+                 "party": [["hamimushi", 4], ["hamimushi", 5]]},
+    "hiker_1":  {"name": "旅の人ミチオ", "money": 200, "intro": "ミチオ『旅は道連れ。一戦どうだい』", "lose": "ミチオ『いい旅になりそうだね』",
+                 "party": [["mokonezu", 6], ["tobitsuba", 6]]},
+    "lass_1":   {"name": "花摘みのサキ", "money": 240, "intro": "サキ『お花畑を荒らさないでね！』", "lose": "サキ『お花、分けてあげる…』",
+                 "party": [["kokemaru", 9], ["homurabi", 9]]},
+    "hiker_2":  {"name": "山男ゴウ", "money": 400, "intro": "ゴウ『暗い洞窟は慣れたもんよ』", "lose": "ゴウ『ガハハ、参った！』",
+                 "party": [["gorokko", 13], ["sabigane", 13]]},
+    "fisher_1": {"name": "釣り人ウミオ", "money": 450, "intro": "ウミオ『釣れた獲物で勝負だ！』", "lose": "ウミオ『逃がした魚は大きいなあ』",
+                 "party": [["minamochi", 16], ["dokunuma", 17]]},
+    "kiri_grunt_1": {"name": "霧の会の会員", "money": 500, "flag": "kiri_encounter_1",
+                 "intro": "白い服の人『あなたも苦しい記憶をお持ちでしょう？ 私たち霧の会は、それを霧に溶かしてさしあげるのです。…邪魔をするなら、少し眠っていただきます』",
+                 "lose": "白い服の人『…いずれわかりますよ。忘れることこそ救いなのだと』",
+                 "party": [["kageboshi", 11], ["dokunuma", 11]]},
+    "kiri_grunt_2": {"name": "霧の会の会員", "money": 700, "flag": "kiri_encounter_2",
+                 "intro": "白い服の人『忘れ岬の石碑は私たちが預かります。記録など、痛みの種でしかない』",
+                 "lose": "白い服の人『石碑を削っても、まだ足りないのか…』",
+                 "party": [["kageboshi", 17], ["minamochi", 17], ["yumetsubaki", 18]]},
+
+    "boss_ishi":   {"name": "石の道場主イワネ", "boss": true, "reward_item": "maki_rockslide", "town": "ishi", "money_per_level": 60,
+                    "intro": "イワネ『よう来た。岩のように動じぬ心、見せてもらおう！』", "lose": "イワネ『見事！ この石のメダルを持っていけ。大岩を砕けるようになるぞ』",
+                    "party": [["gorokko", -2], ["gorodai", 0]]},
+    "boss_mori":   {"name": "森の道場主コノハ", "boss": true, "reward_item": "maki_leaf_blade", "town": "mori", "money_per_level": 60,
+                    "intro": "コノハ『森は何でも覚えているの。あなたの戦い方も、ね』", "lose": "コノハ『森のメダルよ。茂みを切り開いて進めるわ』",
+                    "party": [["kokemaru", -2], ["yumetsubaki", -1], ["kokemori", 0]]},
+    "boss_minato": {"name": "港の道場主ナギサ", "boss": true, "reward_item": "maki_wave_crash", "town": "minato", "money_per_level": 60,
+                    "intro": "ナギサ『潮の満ち引きみたいに、押して引いて。ついてこられる？』", "lose": "ナギサ『港のメダル。これで海を渡れるよ』",
+                    "party": [["minamochi", -2], ["dokunuma", -1], ["minamoruga", 0]]}
+  },
+  "medals": {
+    "ishi":   {"name": "石のメダル", "unlocks": "R", "unlock_msg": "大岩を砕いて進めるようになった"},
+    "mori":   {"name": "森のメダル", "unlocks": "T", "unlock_msg": "茂みを切り開いて進めるようになった"},
+    "minato": {"name": "港のメダル", "unlocks": "~", "unlock_msg": "水の上を渡れるようになった"}
+  }
+}

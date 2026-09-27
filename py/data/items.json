@@ -1,0 +1,44 @@
+{
+  "_note": "kind: capture|heal|cure|revive|scroll|key / scroll.move: 覚えさせる技（使っても4つ埋まっていて覚えなかった時は減らない） / capture.mode: flat|night|first_turn|type|ignore_level|legend|master",
+  "items": {
+    "musubi":      {"name": "ムスビカゴ",       "kind": "capture", "price": 200,  "capture": {"mode": "flat", "mult": 1.0}, "desc": "モンスターを捕まえる籠。"},
+    "tsuyomusubi": {"name": "ツヨムスビカゴ",   "kind": "capture", "price": 600,  "capture": {"mode": "flat", "mult": 1.5}, "desc": "編み目の細かい籠。ムスビカゴより捕まえやすい。"},
+    "kamimusubi":  {"name": "カミムスビカゴ",   "kind": "capture", "price": 1200, "capture": {"mode": "flat", "mult": 2.0}, "desc": "熟練の職人が編んだ籠。さらに捕まえやすい。"},
+    "yomusubi":    {"name": "ヨムスビカゴ",     "kind": "capture", "price": 1000, "capture": {"mode": "night", "mult": 3.0}, "desc": "夜や洞窟の中でよく効く籠。"},
+    "sakimusubi":  {"name": "サキムスビカゴ",   "kind": "capture", "price": 1000, "capture": {"mode": "first_turn", "mult": 4.0}, "desc": "出会ってすぐに投げるとよく効く籠。"},
+    "kirimusubi":  {"name": "キリムスビカゴ",   "kind": "capture", "price": 1000, "capture": {"mode": "type", "type": "霧", "mult": 3.0}, "desc": "霧をまとうモンスターによく効く籠。"},
+    "koemusubi":   {"name": "コエムスビカゴ",   "kind": "capture", "price": 5000, "capture": {"mode": "ignore_level", "mult": 1.0}, "desc": "格上の相手でも捕まえやすさが落ちない籠。"},
+    "inishie":     {"name": "イニシエカゴ",     "kind": "capture", "price": 0,    "capture": {"mode": "legend", "mult": 3.0}, "desc": "伝説に語られるものにだけ応える古い籠。"},
+    "makoto":      {"name": "マコトムスビ",     "kind": "capture", "price": 0,    "capture": {"mode": "master", "mult": 1.0}, "desc": "どんな相手も必ず結ぶと伝わる籠。この世に一つきり。"},
+    "iwaimusubi":  {"name": "イワイムスビカゴ", "kind": "capture", "price": 0,    "capture": {"mode": "flat", "mult": 1.0}, "desc": "お店が おまけにくれる お祝いの籠。ムスビカゴと同じくらい捕まえやすい。"},
+    "tabichizu":   {"name": "たびの地図",       "kind": "key",     "price": 300,  "desc": "この地方の地図。バッグから開くと 今いる場所と 行ったことのある場所が わかる。"},
+    "wakeai_suzu": {"name": "わけあいの鈴",     "kind": "key",     "price": 0,    "desc": "鳴らしておくと 戦闘に 出なかった 仲間も 経験値を すこし もらえる。バッグから 選ぶと ON／OFF を 切り替える。"},
+
+    "dango":       {"name": "薬草団子",         "kind": "heal",   "price": 300,  "heal": 20,  "desc": "体力を20回復する。"},
+    "jodango":     {"name": "上薬草団子",       "kind": "heal",   "price": 700,  "heal": 60,  "desc": "体力を60回復する。"},
+    "tokudango":   {"name": "特上薬草団子",     "kind": "heal",   "price": 2500, "heal": 9999, "desc": "体力をすべて回復する。"},
+    "kiyomizu":    {"name": "清め水",           "kind": "cure",   "price": 500,  "desc": "状態異常をすべて治す。"},
+    "fukkatsu":    {"name": "よみがえりの羽",   "kind": "revive", "price": 1500, "desc": "ひんしのモンスターを体力半分で復活させる。"},
+    "maki_kick":       {"name": "けりつけの巻物",     "kind": "scroll", "move": "kick",       "price": 1000, "desc": "武の技『けりつけ』を覚えさせる。岩によく効く。"},
+    "maki_water_shot": {"name": "みずでっぽうの巻物", "kind": "scroll", "move": "water_shot", "price": 1000, "desc": "水の技『みずでっぽう』を覚えさせる。岩・火によく効く。"},
+    "maki_jiryokudan": {"name": "じりょくだんの巻物", "kind": "scroll", "move": "jiryokudan", "price": 1000, "desc": "金の技『じりょくだん』を覚えさせる。岩・氷・霊によく効く。"},
+    "maki_vine_lash":  {"name": "つるむちの巻物",     "kind": "scroll", "move": "vine_lash",  "price": 1000, "desc": "樹の技『つるむち』を覚えさせる。岩・水によく効く。"},
+    "maki_rockslide":  {"name": "岩なだれの巻物",     "kind": "scroll", "move": "rockslide",  "price": 3000, "desc": "岩の技『岩なだれ』を覚えさせる。火・雷・氷・虫によく効く。"},
+    "maki_leaf_blade": {"name": "はっぱ手裏剣の巻物", "kind": "scroll", "move": "leaf_blade", "price": 3000, "desc": "樹の技『はっぱ手裏剣』を覚えさせる。急所に当たりやすい。"},
+    "maki_wave_crash": {"name": "波がしらの巻物",     "kind": "scroll", "move": "wave_crash", "price": 3000, "desc": "水の技『波がしら』を覚えさせる。"}
+  },
+  "shop_tiers": {
+    "_note": "どの街の店も同じ品ぞろえ。[必要メダル数, 追加される品] を累積で並べる。key 品は持っていれば並ばない",
+    "tiers": [
+      [0, ["musubi", "tsuyomusubi", "dango", "jodango", "kiyomizu", "fukkatsu", "tabichizu", "maki_kick", "maki_water_shot", "maki_vine_lash"]],
+      [1, ["yomusubi", "sakimusubi"]],
+      [2, ["kamimusubi", "kirimusubi", "koemusubi", "tokudango"]]
+    ]
+  },
+  "shop_bonus": {"_note": "kind の品を per 個買うごとに gift を1個おまけ", "kind": "capture", "per": 10, "gift": "iwaimusubi"},
+  "pickup": {
+    "_note": "weight は 65536 分率。makoto は 1/65536",
+    "chance": 3277,
+    "table": [["dango", 30000], ["musubi", 16000], ["kiyomizu", 9000], ["jodango", 6000], ["tsuyomusubi", 3000], ["fukkatsu", 1200], ["kamimusubi", 335], ["makoto", 1]]
+  }
+}

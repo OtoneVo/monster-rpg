@@ -197,7 +197,39 @@
   const HP_STEPS = 48;
 
   const monInfo = sid => (DEX && DEX.species[sid]) || { line: String(sid), stage: 0, types: ['ノーマル'], name: '？？？' };
-  const monSprite = (sid, back, shiny) => Art.monster(sid, monInfo(sid), !!back, !!shiny);
+  // 差し替え画像（data/images.json）。読み込めた種族だけ 手描きの代わりに使う。読み込み中・失敗時は 手描きのまま
+  // 色違いも 同じ画像。後ろ姿は 左右反転で 代用する
+  const IMG = {}, imgSprite = {};
+  let imgRedraw = 0;
+  function loadImages() {
+    for (const [sid, s] of Object.entries(DEX.species)) {
+      if (!s.img) continue;
+      const im = new Image();
+      im.onload = () => {
+        if (!im.naturalWidth || !im.naturalHeight) return;
+        IMG[sid] = im;
+        for (const k of Object.keys(iconCache)) if (k.startsWith(sid + '|')) delete iconCache[k];
+        clearTimeout(imgRedraw);
+        imgRedraw = setTimeout(() => { if (N) renderPanel(); }, 60);  // まとめて 描き直す
+      };
+      im.src = s.img;
+    }
+  }
+  function imageSprite(sid, back) {
+    const k = sid + '|' + !!back;
+    if (imgSprite[k]) return imgSprite[k];
+    const im = IMG[sid], ref = Art.monster(sid, monInfo(sid), false, false);
+    const W = ref.width, H = ref.height;
+    const [c, x] = Art.canvas(W, H);
+    const sc = Math.min(W / im.naturalWidth, H / im.naturalHeight);
+    const w = Math.max(1, Math.round(im.naturalWidth * sc)), h = Math.max(1, Math.round(im.naturalHeight * sc));
+    x.imageSmoothingEnabled = sc < 1;  // 縮小は なめらかに、拡大は ドットのまま
+    if (x.imageSmoothingEnabled) x.imageSmoothingQuality = 'high';
+    if (back) { x.translate(W, 0); x.scale(-1, 1); }
+    x.drawImage(im, Math.floor((W - w) / 2), H - h, w, h);  // 足元を 手描きと そろえる
+    return (imgSprite[k] = c);
+  }
+  const monSprite = (sid, back, shiny) => IMG[sid] ? imageSprite(sid, !!back) : Art.monster(sid, monInfo(sid), !!back, !!shiny);
   const silCache = new WeakMap();
   function silhouette(c, color) {
     let m = silCache.get(c);
@@ -295,6 +327,7 @@
   const hintCache = {};
   function hintText() {
     if (busy || !N || MSG.pages) return null;
+    if (scene === 'prof') return PF.hint || null;  // 名前を 選ぶ間も 博士の 問いかけを 残す
     if (scene === 'battle' && N.battle && B) {
       if (N.battle.state === 'force_switch') return N.battle.kind === 'wild' ? '次の モンスターを 出す？ 逃げる？' : '次に出す モンスターを 選んでください';
       if (N.battle.state === 'offer_switch') return ui.sub === 'oswitch' ? '入れ替える モンスターを 選んでください' : 'モンスターを 入れ替えますか？';
@@ -841,16 +874,18 @@
     showBanner(st.area.name);
   }
   const objAt = (x, y) => (areaView ? areaView.objects.find(o => o.x === x && o.y === y) : null);
+  const DEFAULT_GATES = 'RT~';  // サーバが 関門の文字を 送らない 古い版の時だけ 使う
   function canWalk(x, y, dir) {
     const a = areaView;
     if (!a || y < 0 || y >= a.map.length || x < 0 || x >= a.map[0].length) return false;
     if ((a.blocked || []).some(([bx, by]) => bx === x && by === y)) return false;  // 建物の壁
     const o = objAt(x, y);
     if (o && o.kind !== 'exit') return false;
+    if (o && o.closed) return false;  // 条件を 満たしていない出口（サーバと同じ判定。歩き出してから 戻さない）
     if (o && o.building && dir !== 'up') return false;  // 建物は 正面（下から上へ）だけ 入れる
     const ch = a.map[y][x];
-    if (ch === '#') return false;
-    if ('RT~'.includes(ch)) return a.unlocked.includes(ch);
+    if (ch === '#' || ch === 'D') return false;  // 'D' は カウンター（サーバの passable と同じ）
+    if ((a.gates || DEFAULT_GATES).includes(ch)) return a.unlocked.includes(ch);
     return true;
   }
   function walkAnim(tx, ty, dir) {
@@ -877,6 +912,7 @@
     const shown = raw.map(cleanMsg).filter(m => m && !isNoise(m));
     if (!shown.length && !res.error && !res.state.battle && res.state.area.id === areaView.id) {
       N = res.state;
+      areaView = N.area;  // 出口の 開き閉じ（closed）も サーバの最新に そろえる
       if (N.player.x * 16 !== P.x || N.player.y * 16 !== P.y) snapP();
       P.facing = dir;
       // 歩数・朝昼夜・HP は 歩くたびに 変わるので、とけい／なかまの ページだけ 描き直す（メモ・コインは 触らない）
@@ -912,7 +948,7 @@
     if (!freeField()) return;
     const o = facingObj();
     if (!o || o.kind === 'exit') return;
-    if (o.kind !== 'tablet' && o.kind !== 'box' && !o.sign) npcFace[`${o.x},${o.y}`] = { dir: OPP[P.facing], until: T + 5000 };
+    if (!['tablet', 'box', 'item', 'static'].includes(o.kind) && !o.sign) npcFace[`${o.x},${o.y}`] = { dir: OPP[P.facing], until: T + 5000 };
     Snd.se('cursor');
     act({ op: 'interact' });
   }
@@ -921,7 +957,7 @@
     if (y < 0 || y >= a.map.length || x < 0 || x >= a.map[0].length) return '#';
     const ch = a.map[y][x];
     if (exits.has(x + ',' + y) && !a.cave) return a.interior ? 'm' : 'p';
-    if ((ch === 'R' || ch === 'T') && a.unlocked.includes(ch)) return a.cave ? ':' : '.';
+    if (ch !== '~' && (a.gates || DEFAULT_GATES).includes(ch) && a.unlocked.includes(ch)) return a.cave ? ':' : '.';
     return ch;
   }
   function drawField() {
@@ -957,6 +993,11 @@
         ents.push({ y: o.y, draw: () => g.drawImage(Art.tablet(), sx, sy - 4) });
       } else if (o.kind === 'box') {
         ents.push({ y: o.y, draw: () => g.drawImage(Art.box(), sx, sy - 4) });
+      } else if (o.kind === 'item') {
+        ents.push({ y: o.y, draw: () => g.drawImage(Art.sparkle(Math.floor(T / 420) % 2), sx, sy - 4) });
+      } else if (o.kind === 'static') {
+        const bob = Math.round(Math.sin(T / 380));
+        ents.push({ y: o.y, draw: () => { shadow(sx + 8, sy + 15); g.drawImage(monSprite(o.species, false, false), sx - 8, sy - 16 + bob, 32, 32); } });
       } else if (o.sign) {
         ents.push({ y: o.y, draw: () => g.drawImage(Art.signpost(), sx, sy - 4) });
       } else {
@@ -1188,6 +1229,26 @@
     });
     drawParticles();
   }
+  function drawProf() {  // 博士の 導入: 明るい 無地の 背景に 1人（1匹）ずつ 出す
+    const gr = g.createLinearGradient(0, 0, 0, H);
+    gr.addColorStop(0, '#fbf6e8'); gr.addColorStop(1, '#cfdcec');
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(60,70,110,.16)'; g.beginPath(); g.ellipse(128, 137, 34, 7, 0, 0, Math.PI * 2); g.fill();
+    const d = introData();
+    if (!d || !PF.show) return;
+    const k = clamp((T - PF.t0) / 280, 0, 1), dx = Math.round((1 - k) * 60);
+    g.globalAlpha = k;
+    if (PF.show === 'monster' && profMon(d)) {
+      const hop = Math.abs(Math.sin(T / 260)) * -3;
+      g.drawImage(monSprite(d.monster, false, false), 96 + dx, 74 + hop, 64, 64);
+    } else {
+      const c = PF.show === 'player' ? Art.person(Art.HERO, 'down', 0)
+        : PF.show === 'rival' ? Art.boss('rival_1') || Art.person(Art.styleFor('rival'), 'down', 0)
+        : Art.person(Art.styleFor('lab'), 'down', 0);
+      g.drawImage(c, 96 + dx, 58, 64, 80);
+    }
+    g.globalAlpha = 1;
+  }
   function enterEvolve(nw) {
     const p = nw.prompt, m = nw.party[p.party];
     EV = { party: p.party, from: p.species, into: p.into || p.species, cur: p.species, phase: 'wait', t0: 0, shiny: m && m.shiny };
@@ -1237,6 +1298,7 @@
     else if (scene === 'battle') drawBattle();
     else if (scene === 'starter') drawStarter();
     else if (scene === 'evolve') drawEvolve();
+    else if (scene === 'prof') drawProf();
     else text('よみこみ中…', 128, 100, { align: 'center', color: '#fff' });
     if (FX.wipe > 0) {
       g.fillStyle = '#000';
@@ -1275,6 +1337,7 @@
     let html;
     if (scene === 'title' || scene === 'boot') html = titlePanel();
     else if (busy) html = `<div class="tapzone" data-a="adv"><div class="dot">▼</div><div class="note">タップで つぎへ</div></div>`;
+    else if (scene === 'prof') html = profPanel();  // はじめからの 導入中は 前の記録の 戦闘・会話を 出さない
     else if (N.battle) html = battlePanel();
     else if (N.prompt) html = promptPanel();
     else html = fieldPanel();
@@ -1323,7 +1386,8 @@
 
   // 名前の入力（タイトルの「はじめる」「はじめから」「つづきから」と、トレーナーカードの「なまえを かえる」で共通）
   function namePane() {
-    const q = ui.nameNext === 'card' ? 'あたらしい なまえを 入れてね（8文字まで）' : 'あなたの なまえを 入れてね（8文字まで）';
+    const q = { card: 'あたらしい なまえを 入れてね（8文字まで）', rival: 'ライバルの あたらしい なまえを 入れてね（8文字まで）',
+      prof_rival: 'ライバルの なまえを 入れてね（8文字まで）' }[ui.nameNext] || 'あなたの なまえを 入れてね（8文字まで）';
     const sub = ui.nameNext === 'cont' ? '<div class="note">いまの 記録には まだ なまえが ありません</div>' : '';
     return pane(`<div class="sheet" style="font-size:var(--fs)">${q}${sub}</div>
       <input id="pname" class="name-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="なまえ" value="${esc(ui.nameDraft || '')}">
@@ -1377,6 +1441,7 @@
     { name: 'かいふく', kinds: ['heal', 'cure', 'revive'] },
     { name: 'ムスビカゴ', kinds: ['capture'] },
     { name: 'わざの巻物', kinds: ['scroll'] },
+    { name: 'そだてる', kinds: ['evolution', 'level_up'] },
     { name: 'たいせつなもの', kinds: ['key'] },
   ];
   function bagPane(usable, action, notes, headR) {
@@ -1411,12 +1476,22 @@
           <div class="l1 note"><span>HP ${m.hp}/${m.max_hp}</span><span>つぎのLvまで</span></div>
           <div class="bar exp"><i style="width:${Math.round(100 * (m.exp_ratio || 0))}%"></i></div></div></div>
           ${statLine(m)}
+          <div class="note">もちもの: ${m.held ? esc(m.held.name) : 'なし'}</div>
           <div class="grid g2">${moves}</div>
-          <div class="row2">${ui.i > 0 ? '<button class="btn big" data-a="lead">先頭にする</button>' : ''}${backBtn()}</div>`);
+          <div class="row2">${ui.i > 0 ? '<button class="btn big" data-a="lead">先頭にする</button>' : ''}<button class="btn" data-a="hold">持たせる</button>${m.held ? '<button class="btn" data-a="unhold">あずかる</button>' : ''}${backBtn()}</div>`);
+      }
+      case 'holdPick': {
+        const m = me[ui.i];
+        if (!m) { ui.sub = 'party'; return fieldPanel(); }
+        const evo = N.items.filter(it => it.kind === 'evolution');
+        const list = evo.map(it => `<button class="btn" data-a="holdpick" data-id="${esc(it.id)}"><span>${esc(it.name)}</span><span>×${it.count}</span></button>`).join('');
+        return pane(`<div class="head"><b>${esc(m.name)}に 持たせる</b></div>
+          <div class="note">持たせられるのは 進化の道具だけ</div>
+          <div class="list">${list || '<div class="note">持たせられる 道具が ない</div>'}</div>${backBtn()}`);
       }
       case 'bag':
-        return bagPane(it => (['heal', 'cure', 'revive', 'scroll'].includes(it.kind) && me.length > 0) || (it.id === 'tabichizu' && N.world) || it.id === 'wakeai_suzu', 'item',
-          ['', 'ムスビカゴは 野生の モンスターとの 戦闘中に 使う', '巻物は ここで 仲間に 技を 覚えさせる', 'たびの地図は 選ぶと 広げられる／わけあいの鈴は 選ぶと ON・OFF'], `${N.money}円`);
+        return bagPane(it => (['heal', 'cure', 'revive', 'scroll', 'evolution', 'level_up'].includes(it.kind) && me.length > 0) || (it.id === 'tabichizu' && N.world) || it.id === 'wakeai_suzu', 'item',
+          ['', 'ムスビカゴは 野生の モンスターとの 戦闘中に 使う', '巻物は ここで 仲間に 技を 覚えさせる', '追憶の栞は ここで 仲間に 使う／進化の道具は 手持ちの 画面から 持たせる', 'たびの地図は 選ぶと 広げられる／わけあいの鈴は 選ぶと ON・OFF'], `${N.money}円`);
       case 'dex': {
         const seen = new Set(N.dex.seen_ids || []), caught = new Set(N.dex.caught_ids || []);
         const rows = dexOrder().map(sid => {
@@ -1447,10 +1522,11 @@
         return pane(`<div class="head"><b>トレーナーカード</b><span>${esc(N.area.name)}</span></div>
           <div class="sheet tcard">${lead ? `<img src="${icon(lead.species, lead.shiny)}" alt="" style="float:right;width:calc(var(--fs)*3);image-rendering:pixelated">` : ''}
           <div>なまえ　${N.player_name ? esc(N.player_name) : '未設定'}</div>
+          <div>ライバル　${esc(N.rival_name || '')}</div>
           <div>おこづかい　${N.money}円</div><div>ずかん　${N.dex.caught}匹</div><div>ボックス　${N.box_count}匹</div>
           <div class="note">${esc(N.phase)}</div><div style="clear:both"></div>
           <div class="note" style="margin-top:4px">メダル ${N.medals.length}/${N.medal_total || N.medals.length}</div><div class="medals" style="margin:4px 0 0">${medals}</div></div>
-          <div class="grid g2 foot"><button class="btn" data-a="rename">なまえを かえる</button>${backBtn()}</div>`);
+          <div class="grid g2 foot"><button class="btn" data-a="rename">なまえを かえる</button><button class="btn" data-a="rerival">ライバルの なまえ</button>${backBtn()}</div>`);
       }
       case 'name': {
         return namePane();
@@ -1494,8 +1570,9 @@
   function worldSvg(w) {
     const cs = w.cells || [], at = {};
     cs.forEach(c => { at[c.id] = c; });
-    const CW = 66, CH = 40, X = c => c.col * CW + CW / 2, Y = c => c.row * CH + CH / 2;
-    const cols = Math.max(1, ...cs.map(c => c.col + 1)), rows = Math.max(1, ...cs.map(c => c.row + 1));
+    const c0 = cs.length ? Math.min(...cs.map(c => c.col)) : 0, r0 = cs.length ? Math.min(...cs.map(c => c.row)) : 0;
+    const CW = 66, CH = 40, X = c => (c.col - c0) * CW + CW / 2, Y = c => (c.row - r0) * CH + CH / 2;
+    const cols = Math.max(1, ...cs.map(c => c.col - c0 + 1)), rows = Math.max(1, ...cs.map(c => c.row - r0 + 1));
     const lines = (w.edges || []).map(([a, b]) => at[a] && at[b] && (at[a].visited || at[b].visited)
       ? `<line x1="${X(at[a])}" y1="${Y(at[a])}" x2="${X(at[b])}" y2="${Y(at[b])}" stroke="#7a8a9a" stroke-width="3" stroke-linecap="round"/>` : '').join('');
     const boxes = cs.map(c => {
@@ -1637,7 +1714,7 @@
       case 'bag': {
         const wild = b.kind === 'wild';
         return bagPane(it => (it.kind === 'capture' && wild) || ['heal', 'cure', 'revive'].includes(it.kind), 'bitem',
-          ['', wild ? '' : 'トレーナー戦では 捕まえられない', '巻物は 戦闘中には 使えない', ''], '');
+          ['', wild ? '' : 'トレーナー戦では 捕まえられない', '巻物は 戦闘中には 使えない', 'この道具は 戦闘中には 使えない', ''], '');
       }
       case 'bagT': {
         const it = N.items.find(x => x.id === ui.item);
@@ -1711,8 +1788,10 @@
       return pane(`<div style="flex:1"></div><button class="btn big fight cmd" data-a="evo" data-i="0">進化させる</button>
         <button class="btn big" data-a="evo" data-i="1">やめさせる</button><div style="flex:1"></div>`, 'title-bg');
     }
-    const opts = p.options.map((o, i) => `<button class="btn ${i === p.options.length - 1 && p.kind === 'learn_move' ? 'back' : ''}" data-a="popt" data-i="${i}">${esc(o)}</button>`).join('');
-    return pane(`<div class="head"><b>${p.kind === 'learn_move' ? '技を 覚える' : 'えらぶ'}</b></div><div class="list">${opts}</div>`);
+    const lastBack = ['learn_move', 'trade', 'gift_choose'].includes(p.kind);
+    const opts = p.options.map((o, i) => `<button class="btn ${i === p.options.length - 1 && lastBack ? 'back' : ''}" data-a="popt" data-i="${i}">${esc(o)}</button>`).join('');
+    const head = { learn_move: '技を 覚える', trade: '交換', gift_choose: 'もらう' }[p.kind] || 'えらぶ';
+    return pane(`<div class="head"><b>${head}</b></div><div class="list">${opts}</div>`);
   }
 
   // ---- 下画面の操作 ----
@@ -1725,7 +1804,7 @@
         const next = ui.nameNext;
         ui.nameErr = ''; ui.nameDraft = ''; ui.nameNext = '';
         if (next === 'cont') { enterGame(false); return; }
-        ui.sub = next === 'card' ? 'card' : 'main';
+        ui.sub = next === 'card' || next === 'rival' ? 'card' : 'main';  // 博士の 導入から 来たら 名前の 候補へ 戻る
         renderPanel();
         return;
       }
@@ -1763,6 +1842,9 @@
       ui.sub = 'party';
       act({ op: 'order', order });
     },
+    hold: () => { Snd.se('ok'); ui.sub = 'holdPick'; renderPanel(); },
+    holdpick: d => { ui.sub = 'mon'; act({ op: 'hold', item: d.id, target: ui.i }); },
+    unhold: () => { ui.sub = 'mon'; act({ op: 'hold', item: null, target: ui.i }); },
     item: d => {
       Snd.se('ok');
       if (d.id === 'wakeai_suzu') { ui.sub = 'bag'; act({ op: 'item', item: d.id, target: 0 }); return; }
@@ -1842,23 +1924,32 @@
       } : {});
     },
     // タイトル
-    start: () => { if (!N.player_name) openName('start'); else enterGame(!N.intro_seen); },
+    start: () => {
+      if (!N.intro_seen && introData()) runProf('start');
+      else if (!N.player_name) openName('start');
+      else enterGame(!N.intro_seen);
+    },
     cont: () => { if (!N.player_name) openName('cont'); else enterGame(false); },
     new: () => { Snd.se('ok'); ui.sub = 'new1'; renderPanel(); },
     newyes: () => {
       if (ui.sub === 'new1') { Snd.se('ok'); ui.sub = 'new2'; renderPanel(); return; }
-      openName('new');  // 記録を 消すのは 名前を 決めてから（サーバーが 名前を 確かめてから 作り直す）
+      if (introData()) runProf('new');  // 記録を 消すのは 博士に 名前を 伝え終えてから
+      else openName('new');  // 記録を 消すのは 名前を 決めてから（サーバーが 名前を 確かめてから 作り直す）
     },
     rename: () => openName('card', N.player_name || ''),
+    rerival: () => openName('rival', N.rival_name || ''),
+    pfself: () => { if (PF.ask) openName('prof_' + PF.ask); },
+    pfpick: d => { const l = profPresets(); if (PF.ask && l[+d.i] != null) pfSubmit(l[+d.i]); },
     namego: async () => {
       if (busy || ui.sub !== 'name') return;
       const pin = panel.querySelector('#pname');
       const name = pin ? pin.value : (ui.nameDraft || '');
       if (pin) pin.blur();  // iPhone の キーボードを 閉じる
       const next = ui.nameNext;
+      if (next === 'prof_player' || next === 'prof_rival') { pfSubmit(name); return; }
       setBusy(true);
       let res;
-      try { res = await api(next === 'new' ? { op: 'new', name } : { op: 'set_name', name }); } catch (e) { setBusy(false); return; }
+      try { res = await api(next === 'new' ? { op: 'new', name } : { op: next === 'rival' ? 'set_rival' : 'set_name', name }); } catch (e) { setBusy(false); return; }
       N = res.state;
       if (res.error) {  // タイトルでは メッセージ窓が 出ないので、入力欄の 下に 理由を 出す
         Snd.se('buzz'); ui.nameErr = res.error; ui.nameDraft = name;
@@ -1866,7 +1957,7 @@
         return;
       }
       ui.nameErr = ''; ui.nameDraft = ''; ui.nameNext = '';
-      if (next === 'card') { Snd.se('ok'); ui.sub = 'card'; setBusy(false); return; }
+      if (next === 'card' || next === 'rival') { Snd.se('ok'); ui.sub = 'card'; setBusy(false); return; }
       busy = false; ui.sub = 'main';
       if (next === 'new') enterGame(true);
       else if (next === 'start') enterGame(!N.intro_seen);
@@ -1883,13 +1974,82 @@
   });
 
   // ================= 場面の出入り =================
+  // ---- 博士の 導入（台詞・博士の名前・名前の候補は data/intro.json で 変える）----
+  const PF = { show: null, t0: 0, ask: null, hint: '', resolve: null };
+  const introData = () => { const d = DEX && DEX.intro; return d && Array.isArray(d.script) && d.script.length ? d : null; };
+  const profMon = d => !!(d.monster && DEX.species && DEX.species[d.monster]);
+  // {prof} {player} {rival} を 1回で 置き換える（名前に {rival} と 書かれていても 二重に 置き換えない）
+  const fillIntro = (s, v) => String(s).replace(/\{(prof|player|rival)\}/g, (m, k) => v[k] || m);
+  const profPresets = () => { const d = introData() || {}; return (PF.ask === 'rival' ? d.rival_presets : d.player_presets) || []; };
+  function profPanel() {
+    if (ui.sub === 'name') return namePane();
+    if (!PF.ask) return `<div class="tapzone" data-a="adv"><div class="dot">▼</div><div class="note">タップで つぎへ</div></div>`;
+    return pane(`<div class="head"><b>${PF.ask === 'rival' ? 'ライバルの なまえ' : 'あなたの なまえ'}</b></div><div class="list">
+      <button class="btn big" data-a="pfself">じぶんで きめる</button>
+      ${profPresets().map((n, i) => `<button class="btn big" data-a="pfpick" data-i="${i}">${esc(n)}</button>`).join('')}</div>`);
+  }
+  async function pfSubmit(name) {  // 聞いた 名前を サーバーで 確かめてから 次の 台詞へ（記録は まだ 変えない）
+    if (busy || !PF.resolve) return;
+    const kind = PF.ask;
+    setBusy(true);
+    let res;
+    try { res = await api({ op: 'check_name', name }); } catch (e) { setBusy(false); return; }
+    if (res.error) {
+      Snd.se('buzz');
+      Object.assign(ui, { sub: 'name', nameNext: 'prof_' + kind, nameErr: res.error, nameDraft: String(name) });
+      setBusy(false);
+      return;
+    }
+    Snd.se('ok');
+    Object.assign(ui, { sub: 'main', nameNext: '', nameErr: '', nameDraft: '' });
+    const r = PF.resolve; PF.resolve = null;
+    r(String(name).normalize('NFC').trim());
+  }
+  async function runProf(mode) {  // mode: 'new'＝はじめから（最後に 記録を 作り直す）／'start'＝まだ 相棒の いない 記録
+    const d = introData();
+    Snd.init(); Snd.se('ok');
+    setBusy(true);
+    await tween(300, t => { FX.fade = t; });
+    scene = 'prof'; ui.sub = 'main';
+    Object.assign(PF, { show: null, ask: null, hint: '', resolve: null });
+    renderPanel();
+    await tween(320, t => { FX.fade = 1 - t; });
+    FX.fade = 0;
+    const v = { prof: d.prof_name || '博士', player: '', rival: '' };
+    for (const st of d.script) {
+      if (st.show && st.show !== PF.show) {
+        PF.show = st.show; PF.t0 = T;
+        if (st.show === 'monster' && profMon(d)) Snd.cry(d.monster);
+      }
+      if (st.say) await say(fillIntro(st.say, v));
+      if (st.ask) {
+        PF.hint = st.say ? fillIntro(st.say, v) : '';
+        PF.ask = st.ask;
+        v[st.ask] = await new Promise(res => { PF.resolve = res; setBusy(false); });
+        PF.ask = null; PF.hint = '';
+      }
+    }
+    let res;
+    try {
+      if (mode === 'new') res = await api({ op: 'new', name: v.player, rival: v.rival });
+      else {
+        res = await api({ op: 'set_name', name: v.player });
+        if (!res.error) res = await api({ op: 'set_rival', name: v.rival });
+      }
+    } catch (e) { goTitle(); return; }
+    N = res.state;
+    if (res.error) { Snd.se('buzz'); await say(res.error); goTitle(); return; }
+    busy = false;
+    enterGame(true, true);
+  }
+
   const INTRO = [
     'ようこそ！ ここから きみの モンスターとの 旅が はじまる。',
     'まずは 左上の 青い屋根の 研究所へ。 博士から 相棒の モンスターを もらおう。',
     '建物には 扉に 向かって 歩けば 入れる。 人や 石碑は 向き合って A ボタンで 話せる。',
     '下の画面は たびの手帳。 ☰ メニューで ずかん・モンスター・バッグを 開ける。 冒険は 毎回 自動で 記録される。',
   ];
-  async function enterGame(intro) {
+  async function enterGame(intro, afterProf) {
     Snd.init(); Snd.se('ok');
     setBusy(true);
     await tween(300, t => { FX.fade = t; });
@@ -1910,7 +2070,7 @@
     FX.fade = 0;
     if (scene === 'field') showBanner(N.area.name);
     if (intro) {
-      for (const line of INTRO) await say(line);
+      for (const line of afterProf ? INTRO.slice(1) : INTRO) await say(line);  // 博士の 後は 最初の「ようこそ」を 省く
       try { N = (await api({ op: 'intro_seen' })).state; } catch (e) { /* 次回も出るだけ */ }
     }
     setBusy(false);
@@ -2068,6 +2228,7 @@
     DEX = dex;
     for (const [sid, s] of Object.entries(DEX.species)) if (!NAME2SID[s.name]) NAME2SID[s.name] = sid;
     N = st.state;
+    loadImages();
     parade = Array.from({ length: 4 }, (_, i) => ({ sid: randomSid(), x: -60 - i * 70, ph: i }));
     scene = 'title';
     Snd.play('title');

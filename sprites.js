@@ -146,7 +146,7 @@ const Art = (() => {
         if (!((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0))) set(x, y, v);
       }
     };
-    const k = stage >= 1 ? 1.14 : 1; // 進化後は一回り大きく
+    const k = stage >= 2 ? 1.26 : stage >= 1 ? 1.14 : 1; // 進化するたびに一回り大きく
     const t1 = types[0], t2 = types[1] || types[0];
     const feats = new Set([...(FEATURES[t1] || []).slice(0, R() < 0.5 ? 1 : 2)]);
     if (stage >= 1) (FEATURES[t2] || []).forEach(f => feats.add(f));
@@ -259,7 +259,7 @@ const Art = (() => {
     return [null, base, belly, acc, [255, 255, 255], [28, 24, 40], dark(base, 0.55), acc2];
   }
 
-  // line: 進化の系統の根の種族ID（同じ系統は形が似る）、stage: 0/1
+  // line: 進化の系統の根の種族ID（同じ系統は形が似る）、stage: 0/1/2
   function monster(species, info, back = false, shiny = false) {
     const key = `${species}|${back}|${shiny}`;
     if (cache.has(key)) return cache.get(key);
@@ -561,6 +561,40 @@ const Art = (() => {
         for (let k = 0; k < 3; k++) { const wx = (k * 6 + o * 2 + (v % 3)) % 16, wy = 3 + k * 5; x.fillRect(wx, wy, 4, 1); x.fillRect(wx + 1, wy - 1, 2, 1); }
         break;
       }
+      case 'K': // 暗闇（灯りが要る）
+        fill('#141018'); speckle(['#1e1a24', '#0c0a10', '#2a2432'], 16);
+        x.fillStyle = '#3a3448'; x.fillRect(3, 4, 1, 1); x.fillRect(11, 9, 1, 1);
+        break;
+      case 'M': // 重い扉（鋲打ちの鉄扉）
+        cave ? (fill('#6a5a4a'), speckle(['#5a4a3c'], 10)) : ground();
+        x.fillStyle = '#3c4048'; x.fillRect(1, 1, 14, 15);
+        x.fillStyle = '#6a707c'; x.fillRect(2, 2, 12, 13);
+        x.fillStyle = '#4c525c'; x.fillRect(7, 2, 2, 13); x.fillRect(2, 8, 12, 1);
+        x.fillStyle = '#b8bec8'; [[3, 3], [12, 3], [3, 13], [12, 13], [5, 6], [10, 6]].forEach(([i, j]) => x.fillRect(i, j, 1, 1));
+        x.fillStyle = '#e0c060'; x.fillRect(9, 9, 2, 2);
+        break;
+      case 'E': { // 電気の柵（杭とジグザグの電線）
+        cave ? (fill('#6a5a4a'), speckle(['#5a4a3c'], 10)) : ground();
+        x.fillStyle = '#5a4a3a'; x.fillRect(1, 3, 2, 13); x.fillRect(13, 3, 2, 13);
+        x.fillStyle = frame % 2 ? '#fff080' : '#f0d020';
+        for (const wy of [5, 10]) for (let i = 3; i < 13; i++) x.fillRect(i, wy + ((i % 4) < 2 ? 0 : 1), 1, 1);
+        x.fillStyle = '#c0c0c8'; x.fillRect(1, 2, 2, 1); x.fillRect(13, 2, 2, 1);
+        break;
+      }
+      case 'W': // 崖（岩肌と段）
+        fill('#8a6a48');
+        x.fillStyle = '#a8845c'; x.fillRect(0, 0, 16, 3); x.fillRect(0, 7, 16, 2);
+        x.fillStyle = '#5e452e'; x.fillRect(0, 3, 16, 1); x.fillRect(0, 9, 16, 1); x.fillRect(0, 15, 16, 1);
+        x.fillStyle = '#6e5238'; x.fillRect(4, 4, 1, 3); x.fillRect(11, 10, 1, 4); x.fillRect(8, 1, 1, 2);
+        speckle(['#9a7a54', '#704f34'], 8);
+        break;
+      case 'F': { // 吹雪（雪面と流れる風）
+        fill('#e8f0f8'); speckle(['#d0dcec', '#ffffff', '#c4d4e8'], 22);
+        x.fillStyle = '#a8c0dc';
+        const o = frame % 4;
+        for (let k = 0; k < 3; k++) { const wx = (k * 5 + o * 3) % 16, wy = 2 + k * 5; x.fillRect(wx, wy, 5, 1); x.fillRect((wx + 7) % 16, wy + 2, 3, 1); }
+        break;
+      }
       default: ground();
     }
     tileCache.set(key, c);
@@ -711,6 +745,22 @@ const Art = (() => {
     return c;
   }
 
+  // 落ちている道具（小さな包みが きらりと光る。f=0/1 で光り方が変わる）
+  function sparkle(f = 0) {
+    const key = 'sparkle' + f;
+    if (cache.has(key)) return cache.get(key);
+    const [c, x] = canvas(16, 20);
+    x.fillStyle = 'rgba(0,0,0,.25)'; x.fillRect(4, 16, 9, 3);
+    x.fillStyle = '#6a4428'; x.fillRect(5, 11, 7, 6);
+    x.fillStyle = '#e8d8a8'; x.fillRect(6, 12, 5, 4);
+    x.fillStyle = '#d83838'; x.fillRect(8, 11, 1, 6); x.fillRect(5, 13, 7, 1);
+    const s = f ? 3 : 2;
+    x.fillStyle = f ? '#ffffff' : '#fff0a0';
+    x.fillRect(12, 7 - s, 1, s * 2 + 1); x.fillRect(12 - s, 7, s * 2 + 1, 1);
+    cache.set(key, c);
+    return c;
+  }
+
   // ムスビカゴ。kind='iwai' は 白地に 紅白の結び紐（イワイムスビカゴ）
   function ball(open = 0, kind = '') {
     const key = `ball|${open}|${kind}`;
@@ -727,5 +777,5 @@ const Art = (() => {
     return c;
   }
 
-  return { monster, person, boss, BOSS_IDS, tile, building, tablet, signpost, box, ball, styleFor, HERO, TYPE, typeColor, hex, rgb, light, dark, hash, rng, canvas };
+  return { monster, person, boss, BOSS_IDS, tile, building, tablet, signpost, box, sparkle, ball, styleFor, HERO, TYPE, typeColor, hex, rgb, light, dark, hash, rng, canvas };
 })();

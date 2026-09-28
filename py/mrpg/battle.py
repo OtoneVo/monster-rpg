@@ -1,5 +1,5 @@
 """ターン制バトル。第4〜5世代の計算式を再現。内部数値はメッセージに出さない。"""
-from .monster import Monster, exp_yield, STATUS_NAMES
+from .monster import Monster, exp_yield, STATUS_NAMES, friendship_cfg
 
 STAGE_NAMES = {"atk": "攻撃", "def": "防御", "spa": "特攻", "spd": "特防", "spe": "素早さ",
                "acc": "命中率", "eva": "回避率"}
@@ -54,7 +54,7 @@ def acc_stage_mult(s):
 
 
 class Battle:
-    def __init__(self, game, kind, enemies, trainer_id=None, legend=False, weather=None):
+    def __init__(self, game, kind, enemies, trainer_id=None, legend=False, weather=None, static_flag=None):
         self.g = game
         self.kind = kind  # wild | trainer | boss
         self.enemies = enemies
@@ -77,6 +77,7 @@ class Battle:
         self.legend = legend
         self.money = 0
         self.captured = None
+        self.static_flag = static_flag  # 固定シンボル戦なら 捕まえた時に立てるフラグ
         self.log = []
         self.frames = []
 
@@ -231,6 +232,8 @@ class Battle:
                     raise ActionError("捕獲器は capture で使ってください")
                 if info["kind"] == "scroll":
                     raise ActionError("巻物は 戦闘中には 使えない")
+                if info["kind"] in ("evolution", "level_up"):
+                    raise ActionError("その道具は 戦闘中には 使えない")
                 t = a.get("target", self.p_idx)
                 if not isinstance(t, int) or not (0 <= t < len(self.party)):
                     raise ActionError("道具を使う相手の番号が正しくない")
@@ -657,7 +660,7 @@ class Battle:
         if self.pending_e is not None:
             if self.state == "choose" and self._bench_ready():
                 nm = self.enemies[self.pending_e]
-                tname = self.data.trainers[self.trainer_id]["name"]
+                tname = self.g.trainer_name(self.trainer_id)
                 msgs.append(f"{tname}は {nm.name}（Lv{nm.level}）を 繰り出そうとしている。")
                 msgs.append("モンスターを 入れ替えますか？")
                 self.state = "offer_switch"
@@ -675,7 +678,7 @@ class Battle:
         self.e_down = False
         self.e_vol = new_vol()
         self.participants = [self.p_idx] if not self.player.fainted else []
-        tname = self.data.trainers[self.trainer_id]["name"]
+        tname = self.g.trainer_name(self.trainer_id)
         msgs.append(f"{tname}は {self.enemy.name}（Lv{self.enemy.level}）を 繰り出した！")
 
     def _award_exp(self, msgs):
@@ -704,6 +707,7 @@ class Battle:
         ups = mon.gain_exp(amt)
         for lv in ups:
             msgs.append(f"{mon.name}は Lv{lv} に 上がった！")
+            mon.add_friendship(friendship_cfg(self.data)["level_up"])
             for mv in mon.new_moves_on(lv):
                 if mon.learn(mv):
                     msgs.append(f"{mon.name}は {self.data.moves[mv]['name']}を 覚えた！")
@@ -711,20 +715,23 @@ class Battle:
                     self.g.queue_prompt({"kind": "learn_move", "party": i, "move": mv})
                     msgs.append(f"{mon.name}は {self.data.moves[mv]['name']}を 覚えたがっている（戦闘後に選択）")
             self.g.note_progress(f"{mon.name} Lv{lv}")
-        if ups and mon.can_evolve():
-            self.g.queue_prompt({"kind": "evolve", "party": i})
+        if ups:
+            self.g.queue_evolve(i, mon)
 
     def _win(self, msgs):
         self.state = "over"
         self.result = "win"
+        for i in dict.fromkeys(self.participants):  # 戦闘に 出て 倒れていない 仲間は すこし なつく
+            if not self.party[i].fainted:
+                self.party[i].add_friendship(friendship_cfg(self.data)["win"])
         if self.kind != "wild":
             t = self.data.trainers[self.trainer_id]
             if t.get("boss"):
                 self.money = t["money_per_level"] * max(m.level for m in self.enemies)
             else:
                 self.money = t["money"]
-            msgs.append(f"{t['name']}との 勝負に 勝った！")
-            msgs.append(t["lose"])
+            msgs.append(f"{self.g.trainer_name(self.trainer_id)}との 勝負に 勝った！")
+            msgs.append(self.g.fmt(t["lose"]))
             msgs.append(f"賞金として {self.money} 円 手に入れた！")
 
     # ---- 交代・道具・捕獲・逃走 ----
@@ -811,7 +818,8 @@ class Battle:
                 "base_weather": self.base_weather, "weather": self.weather, "weather_turns": self.weather_turns,
                 "turn": self.turn, "run_attempts": self.run_attempts, "participants": self.participants,
                 "state": self.state, "result": self.result, "watch": self.watch, "legend": self.legend,
-                "money": self.money, "pending_e": self.pending_e, "e_down": self.e_down}
+                "money": self.money, "pending_e": self.pending_e, "e_down": self.e_down,
+                "static_flag": self.static_flag}
 
     @classmethod
     def from_dict(cls, game, d):
@@ -819,6 +827,7 @@ class Battle:
         b.g = game
         b.enemies = [Monster.from_dict(game.data, m) for m in d.pop("enemies")]
         b.pending_e, b.e_down = None, False  # 古いセーブ向けの既定値
+        b.static_flag = None
         for k, v in d.items():
             setattr(b, k, v)
         b.captured = None

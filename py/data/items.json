@@ -1,5 +1,5 @@
 {
-  "_note": "kind: capture|heal|cure|revive|scroll|key / scroll.move: 覚えさせる技（使っても4つ埋まっていて覚えなかった時は減らない） / capture.mode: flat|night|first_turn|type|ignore_level|legend|master",
+  "_note": "kind: capture|heal|cure|revive|scroll|key|evolution|level_up / evolution: 仲間に持たせて条件を満たすと進化する（進化した時になくなる） / level_up: 仲間のレベルを1上げる（持っているメダルで決まる上限まで） / scroll.move: 覚えさせる技（使っても4つ埋まっていて覚えなかった時は減らない） / capture.mode: flat|night|first_turn|type|ignore_level|legend|master",
   "items": {
     "musubi":      {"name": "ムスビカゴ",       "kind": "capture", "price": 200,  "capture": {"mode": "flat", "mult": 1.0}, "desc": "モンスターを捕まえる籠。"},
     "tsuyomusubi": {"name": "ツヨムスビカゴ",   "kind": "capture", "price": 600,  "capture": {"mode": "flat", "mult": 1.5}, "desc": "編み目の細かい籠。ムスビカゴより捕まえやすい。"},
@@ -13,6 +13,7 @@
     "iwaimusubi":  {"name": "イワイムスビカゴ", "kind": "capture", "price": 0,    "capture": {"mode": "flat", "mult": 1.0}, "desc": "お店が おまけにくれる お祝いの籠。ムスビカゴと同じくらい捕まえやすい。"},
     "tabichizu":   {"name": "たびの地図",       "kind": "key",     "price": 300,  "desc": "この地方の地図。バッグから開くと 今いる場所と 行ったことのある場所が わかる。"},
     "wakeai_suzu": {"name": "わけあいの鈴",     "kind": "key",     "price": 0,    "desc": "鳴らしておくと 戦闘に 出なかった 仲間も 経験値を すこし もらえる。バッグから 選ぶと ON／OFF を 切り替える。"},
+    "key_hajimari": {"name": "始まりの鍵",       "kind": "key",     "price": 0,    "desc": "大穴の底の 古い扉を 開ける鍵。"},
 
     "dango":       {"name": "薬草団子",         "kind": "heal",   "price": 300,  "heal": 20,  "desc": "体力を20回復する。"},
     "jodango":     {"name": "上薬草団子",       "kind": "heal",   "price": 700,  "heal": 60,  "desc": "体力を60回復する。"},
@@ -25,14 +26,27 @@
     "maki_vine_lash":  {"name": "つるむちの巻物",     "kind": "scroll", "move": "vine_lash",  "price": 1000, "desc": "樹の技『つるむち』を覚えさせる。岩・水によく効く。"},
     "maki_rockslide":  {"name": "岩なだれの巻物",     "kind": "scroll", "move": "rockslide",  "price": 3000, "desc": "岩の技『岩なだれ』を覚えさせる。火・雷・氷・虫によく効く。"},
     "maki_leaf_blade": {"name": "はっぱ手裏剣の巻物", "kind": "scroll", "move": "leaf_blade", "price": 3000, "desc": "樹の技『はっぱ手裏剣』を覚えさせる。急所に当たりやすい。"},
-    "maki_wave_crash": {"name": "波がしらの巻物",     "kind": "scroll", "move": "wave_crash", "price": 3000, "desc": "水の技『波がしら』を覚えさせる。"}
+    "maki_wave_crash": {"name": "波がしらの巻物",     "kind": "scroll", "move": "wave_crash", "price": 3000, "desc": "水の技『波がしら』を覚えさせる。"},
+    "maki_flame_wheel": {"name": "かえん輪の巻物", "kind": "scroll", "move": "flame_wheel", "price": 3000, "desc": "火の技『かえん輪』を覚えさせる。"},
+    "maki_bolt_run": {"name": "いなずま走りの巻物", "kind": "scroll", "move": "bolt_run", "price": 3000, "desc": "雷の技『いなずま走り』を覚えさせる。"},
+    "maki_iron_claw": {"name": "鉄の爪の巻物", "kind": "scroll", "move": "iron_claw", "price": 3000, "desc": "金の技『鉄の爪』を覚えさせる。"},
+    "maki_sickle_wind": {"name": "かまいたちの巻物", "kind": "scroll", "move": "sickle_wind", "price": 3000, "desc": "風の技『かまいたち』を覚えさせる。"},
+    "maki_icicle": {"name": "つららばりの巻物", "kind": "scroll", "move": "icicle", "price": 3000, "desc": "氷の技『つららばり』を覚えさせる。"},
+    "watarikaze_obane": {"name": "渡り風の尾羽", "kind": "evolution", "price": 0,    "desc": "季節の風に乗って渡る鳥が落とした尾羽。ある種のモンスターに持たせてレベルアップすると進化する。"},
+    "kiri_kakera": {"name": "霧の欠片", "kind": "evolution", "price": 0,    "desc": "忘れ岬の霧が固まったような、冷たく白い欠片。ある種のモンスターに持たせてレベルアップすると進化する。"},
+    "hyouka_kakera": {"name": "氷華の欠片", "kind": "evolution", "price": 0,    "desc": "溶けずに残る氷の花びら。ある種のモンスターに持たせてレベルアップすると進化する。"},
+    "tetsu_shingane": {"name": "鉄の心金", "kind": "evolution", "price": 0,    "desc": "鍛え抜かれた鉄の芯。ある種のモンスターに持たせてレベルアップすると進化する。"},
+    "hikaru_kakera": {"name": "光る欠片", "kind": "evolution", "price": 0,    "desc": "暗い所でほのかに光る石の欠片。ある種のモンスターに持たせてレベルアップすると進化する。"},
+    "kazaguruma_hane": {"name": "かざぐるまの羽根", "kind": "evolution", "price": 0,    "desc": "風車から外れた古い羽根。ある種のモンスターに持たせてレベルアップすると進化する。"},
+    "tsuioku_shiori": {"name": "追憶の栞", "kind": "level_up", "price": 0,    "desc": "読み聞かせると、忘れていた修行の記憶を思い出してレベルが1上がる。持っているメダルで決まる上限は超えられない。"}
   },
   "shop_tiers": {
     "_note": "どの街の店も同じ品ぞろえ。[必要メダル数, 追加される品] を累積で並べる。key 品は持っていれば並ばない",
     "tiers": [
       [0, ["musubi", "tsuyomusubi", "dango", "jodango", "kiyomizu", "fukkatsu", "tabichizu", "maki_kick", "maki_water_shot", "maki_vine_lash"]],
       [1, ["yomusubi", "sakimusubi"]],
-      [2, ["kamimusubi", "kirimusubi", "koemusubi", "tokudango"]]
+      [2, ["kamimusubi", "kirimusubi", "koemusubi", "tokudango"]],
+      [5, ["maki_flame_wheel", "maki_bolt_run", "maki_iron_claw", "maki_sickle_wind", "maki_icicle"]]
     ]
   },
   "shop_bonus": {"_note": "kind の品を per 個買うごとに gift を1個おまけ", "kind": "capture", "per": 10, "gift": "iwaimusubi"},

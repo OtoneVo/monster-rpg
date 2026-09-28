@@ -2,11 +2,12 @@
 import unicodedata
 
 VIEW_W, VIEW_H = 17, 11
-TILE_LEGEND = {"#": "壁", "D": "家具", ".": "道", ",": "草むら", ":": "洞窟の床", "R": "大岩", "T": "茂み", "~": "水"}
+TILE_LEGEND = {"#": "壁", "D": "家具", ".": "道", ",": "草むら", ":": "洞窟の床", "R": "大岩", "T": "茂み", "~": "水",
+               "K": "暗闇", "M": "重い扉", "E": "電気の柵", "W": "崖", "F": "吹雪"}
 OBJ_CHARS = {"exit": ">", "lab": "L", "heal": "H", "shop": "S", "gym": "G", "npc": "N", "trainer": "!",
-             "tablet": "?", "box": "B"}
+             "tablet": "?", "box": "B", "item": "*", "static": "&"}
 OBJ_LEGEND = {">": "出口", "L": "研究所", "H": "休み処", "S": "店", "G": "道場", "N": "人・看板",
-              "!": "トレーナー", "?": "石碑", "B": "あずかり箱"}
+              "!": "トレーナー", "?": "石碑", "B": "あずかり箱", "*": "落とし物", "&": "ふしぎな気配"}
 
 
 def hp_bar(cur, mx, width=20):
@@ -52,7 +53,7 @@ def map_window(g):
                 ch = "#"  # 建物の壁（入口だけが記号で出る）
             else:
                 ch = a["map"][y][x]
-                if ch in ("R", "T", "~") and g.unlocked(ch):
+                if ch in g.data.gates and g.unlocked(ch):
                     ch = "."
             used.add(ch)
             row += ch
@@ -80,9 +81,9 @@ def battle_screen(g):
     if b.kind == "wild":
         head = "野生の"
     else:
-        head = g.data.trainers[b.trainer_id]["name"] + "の "
+        head = g.trainer_name(b.trainer_id) + "の "
         left = sum(1 for m in b.enemies if not m.fainted)
-        head = f"{g.data.trainers[b.trainer_id]['name']}（残り{left}匹）の "
+        head = f"{g.trainer_name(b.trainer_id)}（残り{left}匹）の "
     st = e.status_label()
     wmap = {"sun": "日差しが強い", "rain": "雨", "fog": "霧", "sand": "砂嵐", "snow": "雪"}
     out = [f"■ 戦闘 ターン{b.turn}" + (f"  天気:{wmap.get(b.weather, b.weather)}" if b.weather else "")]
@@ -124,6 +125,7 @@ def screen(g):
 def world_view(g):
     """たびの地図: 行ったことのある場所だけ名前・id・町かどうかを出す（行っていない所は ？？？、id も伏せる）。
     つながりは 屋外どうしの出口のうち、片方でも行ったことのある場所から出ているものだけ（？？？どうしは出さない）。
+    マスは 行ったことのある場所と、そこから つながっている ？？？ だけに絞る（地方が広いので 先の方は出さない）。
     Web・CLI・MCP で共通"""
     wm = g.data.world_map
     here = g.area.get("parent") or g.area_id
@@ -140,6 +142,8 @@ def world_view(g):
         for o in a["objects"]:
             if o["kind"] == "exit" and o["to"] in wm["cells"] and (aid in g.visited or o["to"] in g.visited):
                 edges.add(tuple(sorted((key[aid], key[o["to"]]))))
+    ends = {x for e in edges for x in e}
+    cells = [c for c in cells if c["visited"] or c["here"] or c["id"] in ends]
     return {"cells": cells, "edges": [list(e) for e in sorted(edges)]}
 
 
@@ -189,6 +193,7 @@ def state_dict(g):
         "nearby_map": rows, "map_legend": legend,
         "party": [{"index": i, "name": m.name, "level": m.level, "types": m.types, "hp": m.hp, "max_hp": m.maxhp,
                    "status": m.status_label() or None,
+                   "held": g.data.items[m.held]["name"] if m.held else None,
                    "moves": [{"name": g.data.moves[mv["id"]]["name"], "type": g.data.moves[mv["id"]]["type"],
                               "pp": mv["pp"], "max_pp": g.data.moves[mv["id"]]["pp"]} for mv in m.moves]}
                   for i, m in enumerate(g.party)],
@@ -200,13 +205,14 @@ def state_dict(g):
         "flags": sorted(f for f in g.flags if not f.startswith("starter_")),
         "dex": {"seen": len(g.seen), "caught": len(g.caught), "habitats": dex_habitats(g)},
         "player_name": g.player_name,
+        "rival_name": g.rival_name,
         "obey_level_cap": g.obey_cap(),
         "in_battle": bool(g.battle),
         "pending_prompt": g.prompt_view() if not g.battle else None,
     }
     fo = g.facing_object()
     if fo and fo["kind"] != "exit":
-        d["facing_object"] = fo.get("label")
+        d["facing_object"] = g.fmt(fo.get("label"))  # {rival} を 名前に
     if g.items.get("tabichizu", 0) > 0:
         d["world_map"] = world_lines(g)
     if g.items.get("wakeai_suzu", 0) > 0:

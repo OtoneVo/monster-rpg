@@ -19,6 +19,13 @@ def exp_for_level(growth, n):
     return max(0, int(1.2 * n ** 3 - 15 * n ** 2 + 100 * n - 140))
 
 
+def friendship_cfg(data):
+    """なつき度の設定（config.friendship）。無い時は既定値"""
+    cfg = {"base": 70, "max": 255, "evolve": 160, "level_up": 10, "win": 2}
+    cfg.update({k: v for k, v in data.config.get("friendship", {}).items() if not k.startswith("_")})
+    return cfg
+
+
 class Monster:
     def __init__(self, data, species, level, rng=None, ivs=None, nature=None, shiny=False):
         self.data = data
@@ -37,6 +44,8 @@ class Monster:
         self.status = None
         self.sleep_turns = 0
         self.toxic_count = 0
+        self.friendship = friendship_cfg(data)["base"]  # なつき度（プレイ画面には数値を出さない）
+        self.held = None  # 持たせている道具の id（持たせて進化 用。進化の道具だけ）
         self.moves = []
         self.reset_moves()
         self.hp = self.stat("hp")
@@ -134,15 +143,47 @@ class Monster:
                 if k == "hp":
                     self.hp += self.maxhp - old_max
 
-    def evolve(self):
-        into = self.sp["evolve"]["into"]
+    def add_friendship(self, n):
+        cfg = friendship_cfg(self.data)
+        self.friendship = max(0, min(cfg["max"], self.friendship + n))
+
+    def evolve(self, into=None):
+        ev = self.sp.get("evolve") or {}
+        into = into or ev["into"]
+        if ev.get("method") == "held_item" and ev.get("into") == into and self.held == ev.get("item"):
+            self.held = None  # 持たせた道具は 進化で なくなる
         old_max = self.maxhp
         self.species = into
         self.hp += self.maxhp - old_max
 
-    def can_evolve(self):
+    def can_evolve(self, game=None, item=None):
+        """進化できるなら進化先の id、できなければ None。
+        evolve に書いてある条件を全部満たした時だけ進化する（method 省略＝レベル進化）。
+        道具進化（method=item）は、その道具を使った時（item 指定）だけ。道具を使った時は道具進化以外は起きない。
+        持たせて進化（method=held_item）は、その道具を持たせた状態の レベルアップ等（item 指定なし）で起きる"""
         ev = self.sp.get("evolve")
-        return bool(ev and self.level >= ev["level"])
+        if not ev:
+            return None
+        if (ev.get("method") == "item") != (item is not None):
+            return None
+        if item is not None and ev.get("item") != item:
+            return None
+        if ev.get("method") == "held_item" and self.held != ev.get("item"):
+            return None
+        if ev.get("level") is not None and self.level < ev["level"]:
+            return None
+        if ev.get("friendship") and self.friendship < friendship_cfg(self.data)["evolve"]:
+            return None
+        if ev.get("time") and (game is None or game.phase() != ev["time"]):
+            return None
+        if ev.get("place") and (game is None or ev["place"] not in game.place_tags()):
+            return None
+        known = [m["id"] for m in self.moves]
+        if ev.get("move") and ev["move"] not in known:
+            return None
+        if ev.get("move_type") and not any(self.data.moves[m]["type"] == ev["move_type"] for m in known):
+            return None
+        return ev["into"]
 
     def heal_full(self):
         self.hp = self.maxhp
@@ -162,7 +203,7 @@ class Monster:
         return {"species": self.species, "level": self.level, "exp": self.exp, "ivs": self.ivs,
                 "evs": self.evs, "nature": self.nature, "shiny": self.shiny, "hp": self.hp,
                 "status": self.status, "sleep_turns": self.sleep_turns, "toxic_count": self.toxic_count,
-                "moves": self.moves}
+                "moves": self.moves, "friendship": self.friendship, "held": self.held}
 
     @classmethod
     def from_dict(cls, data, d):
@@ -171,6 +212,10 @@ class Monster:
         for k in ("species", "level", "exp", "ivs", "evs", "nature", "shiny", "hp", "status",
                   "sleep_turns", "toxic_count", "moves"):
             setattr(m, k, d[k])
+        m.friendship = d.get("friendship", friendship_cfg(data)["base"])  # 古いセーブ向けの既定値
+        held = d.get("held")
+        ok = isinstance(held, str) and data.items.get(held, {}).get("kind") == "evolution"
+        m.held = held if ok else None  # 版で なくなった道具・持たせられない道具を 持っていたら 外す（give_item と同じ条件）
         return m
 
 

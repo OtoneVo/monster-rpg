@@ -3,7 +3,8 @@
   "medals": {
     "order_boss_level": [12, 18, 24, 30, 36, 42, 48, 54],
     "level_cap":        [12, 18, 24, 30, 36, 42, 50, 58, 66],
-    "field_floor_step": 3
+    "field_floor_step": 3,
+    "field_floor_cap_margin": 4
   },
   "obey": {
     "_note": "上限超過レベルごとの言うことを聞かない確率(%)。band: [超過下限, 超過上限, 確率下限, 確率上限]",
@@ -37,5 +38,8 @@
   "time": {"steps_per_phase": 80, "phases": ["朝", "昼", "夜"]},
   "stuck": {"same_area_actions": 30, "no_progress_actions": 150},
   "whiteout_money_ratio": 0.5,
-  "start": {"area": "tsumugi", "x": 9, "y": 6, "money": 3000}
+  "start": {"area": "tsumugi", "x": 9, "y": 6, "money": 3000},
+  "friendship": {"_note": "なつき度（プレイ画面には出さない）。base: 仲間になった時 / evolve: なつき進化に要る値 / level_up・win: レベルアップ（栞を含む）・勝利で増える量", "base": 70, "max": 255, "evolve": 255, "level_up": 10, "win": 2},
+  "story_flags": [{"flag": "fog_cleared", "need_medals": 7, "need_flag": "hideout_cleared", "text": ["どこか 遠くで 霧が 晴れていく 気配がした……", "（大穴の縁への 道が 開けたようだ）"]}],
+  "roamer": {"species": "sasurauma", "flag": "caught_sasurauma", "level": 50, "chance": 4096, "areas": ["route1", "route2", "route3", "quarry", "uraoyama", "tsukimioka", "yodomi", "raikougen", "hanabatake", "takadai", "tani", "kitagake", "yukifumoto"], "need_flag": "fog_cleared", "text": ["風のように 何かが 駆け抜けてきた……！"]}
 }

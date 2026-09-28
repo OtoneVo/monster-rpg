@@ -20,7 +20,7 @@ class PlayLogger:
         rec = {"t": datetime.datetime.now().isoformat(timespec="seconds"), "event": kind, **kw}
         with open(self.jsonl, "a", encoding="utf-8") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-        if kind in ("new_game", "battle_start", "battle_end", "enter_area", "demo_clear", "remix"):
+        if kind in ("new_game", "battle_start", "battle_end", "enter_area", "demo_clear", "champion", "story", "remix"):
             detail = ", ".join(f"{k}={v}" for k, v in kw.items())
             with open(self.md, "a", encoding="utf-8") as f:
                 f.write(f"\n> [{kind}] {detail}\n\n")

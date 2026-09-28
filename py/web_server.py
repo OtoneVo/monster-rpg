@@ -83,6 +83,7 @@ def mon_view(g, m, idx=None):
     d = {"name": m.name, "species": m.species, "level": m.level, "types": list(m.types), "hp": m.hp,
          "max_hp": m.maxhp, "status": m.status_label() or None, "shiny": bool(m.shiny),
          "moves": [move_view(g, mv) for mv in m.moves]}
+    d["held"] = {"id": m.held, "name": g.data.items[m.held]["name"]} if m.held else None
     # 自分のモンスターの能力値と性格（個体値・努力値そのものは出さない）
     d["stats"] = {k: m.stat(k) for k in STATS if k != "hp"}
     nat = g.data.natures[m.nature]
@@ -114,7 +115,7 @@ def battle_view(g):
          "player_index": b.p_idx, "enemy_index": b.e_idx, "enemy": enemy_view(b.enemy),
          "enemy_team": [0 if m.fainted else 1 for m in b.enemies]}
     if b.trainer_id:
-        d["trainer"] = {"id": b.trainer_id, "name": g.data.trainers[b.trainer_id]["name"]}
+        d["trainer"] = {"id": b.trainer_id, "name": g.trainer_name(b.trainer_id)}
     return d
 
 
@@ -130,7 +131,7 @@ def prompt_payload(g):
         p["species"] = mon.species
         p["party"] = g.prompts[0]["party"]
         if p["kind"] == "evolve":
-            p["into"] = (mon.sp.get("evolve") or {}).get("into")
+            p["into"] = p.get("into") or (mon.sp.get("evolve") or {}).get("into")
     if p["kind"] == "shop":
         p["items"] = [{"id": i, "name": g.data.items[i]["name"], "price": g.data.items[i]["price"],
                        "desc": g.data.items[i].get("desc", ""), "kind": g.data.items[i]["kind"],
@@ -151,7 +152,7 @@ def clock_view(g):
 
 
 def dex_payload(data):
-    """見た目の生成に使う公開情報だけ（名前・タイプ・進化系統）。種族値や捕獲率は出さない"""
+    """見た目の生成に使う公開情報だけ（名前・タイプ・進化系統・差し替え画像）。種族値や捕獲率は出さない"""
     parent = {}
     for sid, sp in data.species.items():
         into = (sp.get("evolve") or {}).get("into")
@@ -164,8 +165,11 @@ def dex_payload(data):
             root, stage = parent[root], stage + 1
         out[sid] = {"name": sp["name"], "types": list(sp["types"]), "line": root, "stage": stage,
                     "no": sp.get("no")}
+        img = getattr(data, "images", {}).get(sid)
+        if img:
+            out[sid]["img"] = img  # web/ からの相対パス。読めなければ 手描きのまま
     moves = {mv["name"]: mv["type"] for mv in data.moves.values()}
-    return {"species": out, "moves": moves}
+    return {"species": out, "moves": moves, "intro": getattr(data, "intro", {})}  # 博士の 導入（台詞・名前の 候補）
 
 
 def area_view(g):
@@ -176,13 +180,16 @@ def area_view(g):
         if o["kind"] == "gym":
             return {"trainer": next(t for t, v in g.data.trainers.items() if v.get("boss") and v["town"] == o["town"])}
         return {}
-    objs = [{"x": o["x"], "y": o["y"], "kind": o["kind"], "label": o.get("label", ""), **who(o),
-             **{k: o[k] for k in ("building", "person") if k in o}}
+    objs = [{"x": o["x"], "y": o["y"], "kind": o["kind"], "label": g.fmt(o.get("label", "")), **who(o),
+             **{k: o[k] for k in ("building", "person") if k in o},
+             **({"species": o["species"]} if o["kind"] == "static" else {}),
+             **({"closed": True} if o["kind"] == "exit" and not g.exit_open(o) else {})}  # 閉じた出口へは 歩き出さない
             for o in a["objects"] if g.object_visible(o)]
     return {"id": g.area_id, "name": a["name"], "cave": bool(a.get("cave")), "interior": bool(a.get("interior")),
             "weather": a.get("weather"),
             "map": a["map"], "objects": objs, "blocked": a.get("blocked", []),
-            "unlocked": [ch for ch in ("R", "T", "~") if g.unlocked(ch)]}
+            "gates": "".join(sorted(g.data.gates)),
+            "unlocked": [ch for ch in sorted(g.data.gates) if g.unlocked(ch)]}
 
 
 def frame_view(f):
@@ -233,6 +240,7 @@ def state_payload(g):
         "intro_seen": "web_intro_seen" in g.flags,
         "wakeai_on": g.wakeai_active(),
         "player_name": g.player_name,
+        "rival_name": g.rival_name,
     }
 
 
@@ -259,13 +267,21 @@ class Session:
         if op == "new":
             # 名前つきで はじめる時は、先に名前を確かめる（だめなら 今のセーブは そのまま残す）
             name = Game.clean_name(req["name"]) if "name" in req else None
+            rival = Game.clean_name(req["rival"]) if "rival" in req else None  # ライバル名も 同じく 先に確かめる
             mode = "experiment" if req.get("seed") is not None else "normal"
             self.game = Game(mode, seed=req.get("seed"), logger=self.logger)
             if name is not None:
                 self.game.set_name(name)
+            if rival is not None:
+                self.game.set_rival(rival)
             return ["新しい冒険を はじめた。"]
         if op == "set_name":  # プレイヤー名を 決める・変える
             return g.set_name(req.get("name"))
+        if op == "set_rival":  # ライバルの 名前を 決める・変える
+            return g.set_rival(req.get("name"))
+        if op == "check_name":  # 博士の 導入で 聞いた 名前を 確かめるだけ（セーブは 変えない）
+            Game.clean_name(req.get("name"))
+            return []
         if op == "move":
             return g.move(req.get("direction"), 1)
         if op == "interact":
@@ -283,6 +299,9 @@ class Session:
             return g.reorder_party(req.get("order") or [])
         if op == "box":
             return g.box_action(req.get("action"), req.get("party"), req.get("box"))
+        if op == "hold":  # 持たせる（item が空なら あずかる）
+            it = req.get("item")
+            return g.give_item(it, req.get("target")) if it else g.take_item(req.get("target"))
         raise ActionError("知らない操作")
 
     def handle(self, req):
@@ -292,7 +311,7 @@ class Session:
                 err = None
             except ActionError as e:
                 msgs, err = [], str(e)
-            if req.get("op") not in ("state",):
+            if req.get("op") not in ("state", "check_name"):  # 確かめるだけの 操作は 記録も セーブも しない
                 self.logger.action("web", {k: v for k, v in req.items()}, "", msgs + ([f"({err})"] if err else []))
                 self.game.save(self.slot)
             return make_out(self.game, req, msgs, err)

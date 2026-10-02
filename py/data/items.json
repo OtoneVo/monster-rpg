@@ -51,8 +51,8 @@
   },
   "shop_bonus": {"_note": "kind の品を per 個買うごとに gift を1個おまけ", "kind": "capture", "per": 10, "gift": "iwaimusubi"},
   "pickup": {
-    "_note": "weight は 65536 分率。makoto は 1/65536",
+    "_note": "weight は 65536 分率。makoto は ひろいでは 出ない（霧の会の首領の 1個だけ）",
     "chance": 3277,
-    "table": [["dango", 30000], ["musubi", 16000], ["kiyomizu", 9000], ["jodango", 6000], ["tsuyomusubi", 3000], ["fukkatsu", 1200], ["kamimusubi", 335], ["makoto", 1]]
+    "table": [["dango", 30001], ["musubi", 16000], ["kiyomizu", 9000], ["jodango", 6000], ["tsuyomusubi", 3000], ["fukkatsu", 1200], ["kamimusubi", 335]]
   }
 }

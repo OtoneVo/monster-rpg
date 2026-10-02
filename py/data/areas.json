@@ -33,7 +33,7 @@
         {"x": 9,  "y": 0, "kind": "exit", "to": "route1", "tx": 5, "ty": 18, "label": "1番道路", "require_flag": "got_starter", "block_msg": "博士の声がする。『おーい、まだ外は危ないぞ！ 研究所に寄っていきなさい』"},
         {"x": 10, "y": 0, "kind": "exit", "to": "route1", "tx": 6, "ty": 18, "label": "1番道路", "require_flag": "got_starter", "block_msg": "博士の声がする。『おーい、まだ外は危ないぞ！ 研究所に寄っていきなさい』"},
         {"x": 4,  "y": 3, "kind": "lab", "label": "記録研究所",
-         "gift_monster": {"id": "starter_3", "choose": "starters", "level": 10, "need_dex": 40, "text_before": "図鑑の 記録が 40種を 超えたら、残りの子から もう1体 託そう。", "text_give": "40種も 記録したのか！ 約束どおり、残りの子から 1体 連れていきなさい。"},
+         "gift_monster": {"id": "starter_3", "choose": "starters", "level": 10, "need_dex": 30, "text_before": "図鑑の 記録が 30種以上に なったら、残りの子から もう1体 託そう。", "text_give": "30種も 記録したのか！ 約束どおり、残りの子から 1体 連れていきなさい。"},
          "inside": [
            {"x": 3, "y": 3, "kind": "npc", "label": "助手", "text": "御三家の子たちは みんな 研究所で 大事に 育てているんだ。", "gift_monster": {"id": "starter_2", "choose": "starters", "level": 10, "need_medals": 2, "text_before": "メダルを 2個 集めたら また 来てね。残りの子を 1体 預けたいんだ。", "text_give": "メダル 2個！ 残りの子も 旅に 連れていってあげて。どの子に する？"}},
            {"x": 8, "y": 5, "kind": "npc", "label": "書庫係", "text": "研究所の 書庫には 昔の 旅の記録が たくさん 眠っているんだよ。", "give": {"item": "tsuioku_shiori", "flag": "got_shiori_library", "need_dex": 60, "text_before": "図鑑に 60種 記録できたら、書庫の 古い栞を 1枚 あげるよ。", "text_give": "60種も！ この 追憶の栞を あげよう。読み聞かせると 忘れていた 修行を 思い出すんだって。"}}

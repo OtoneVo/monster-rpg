@@ -15,13 +15,18 @@ def hp_bar(cur, mx, width=20):
     return "[" + "#" * filled + "-" * (width - filled) + "]"
 
 
+def type_paren(types):
+    # タイプのない種（ハジメ）は 括弧ごと 出さない（Web の タイプ札と 同じ）
+    return f" ({'・'.join(types)})" if types else ""
+
+
 def mon_line(m, i=None, show_hp=True):
     head = f"{i}: " if i is not None else ""
     st = m.status_label()
     st = f" [{st}]" if st else ""
     shiny = "★" if m.shiny else ""
     hp = f" HP {m.hp}/{m.maxhp}" if show_hp else ""
-    return f"{head}{shiny}{m.name} Lv{m.level} ({'・'.join(m.types)}){hp}{st}"
+    return f"{head}{shiny}{m.name} Lv{m.level}{type_paren(m.types)}{hp}{st}"
 
 
 def move_lines(g, m):
@@ -87,7 +92,7 @@ def battle_screen(g):
     st = e.status_label()
     wmap = {"sun": "日差しが強い", "rain": "雨", "fog": "霧", "sand": "砂嵐", "snow": "雪"}
     out = [f"■ 戦闘 ターン{b.turn}" + (f"  天気:{wmap.get(b.weather, b.weather)}" if b.weather else "")]
-    out.append(f"  相手: {head}{'★' if e.shiny else ''}{e.name} Lv{e.level} ({'・'.join(e.types)})"
+    out.append(f"  相手: {head}{'★' if e.shiny else ''}{e.name} Lv{e.level}{type_paren(e.types)}"
                f"{' [' + st + ']' if st else ''}")
     out.append(f"        HP {hp_bar(e.hp, e.maxhp)}")
     out.append(f"  自分: {mon_line(p)}")

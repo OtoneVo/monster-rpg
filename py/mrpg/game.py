@@ -758,6 +758,7 @@ class Game:
         if len(self.party) < 6:
             self.party.append(mon)
             return f"{mon.name}を 受け取った！"
+        mon.heal_full()  # 箱に入った子は 全回復
         self.box.append(mon)
         return f"{mon.name}を 受け取った！ 手持ちが いっぱいなので 預かり箱へ 送った。"
 
@@ -962,6 +963,7 @@ class Game:
                 self.party.append(mon)
                 msgs.append(f"{mon.name}が 仲間に 加わった！")
             else:
+                mon.heal_full()  # 箱に入った子は 入り方によらず 全回復（預ける・入れ替えと同じ）
                 self.box.append(mon)
                 msgs.append(f"手持ちが いっぱいなので {mon.name}は 預かり箱へ 送られた。")
             self.note_progress(f"capture {mon.species}")

@@ -311,8 +311,19 @@ class Session:
                 err = None
             except ActionError as e:
                 msgs, err = [], str(e)
-            if req.get("op") not in ("state", "check_name"):  # 確かめるだけの 操作は 記録も セーブも しない
-                self.logger.action("web", {k: v for k, v in req.items()}, "", msgs + ([f"({err})"] if err else []))
+            op = req.get("op")
+            if op not in ("state", "check_name"):  # 確かめるだけの 操作は 記録も セーブも しない
+                args, log_msgs = {k: v for k, v in req.items()}, msgs
+                if op in ("new", "set_name", "set_rival"):  # 名前は 記録に 残さない
+                    args = {"op": op}
+                    if type(req.get("seed")) is int:
+                        args["seed"] = req["seed"]
+                    for k in ("name", "rival"):
+                        if isinstance(req.get(k), str):
+                            args[f"{k}_length"] = len(req[k])
+                    if op != "new" and msgs:
+                        log_msgs = ["(name updated)"]
+                self.logger.action("web", args, "", log_msgs + ([f"({err})"] if err else []))
                 self.game.save(self.slot)
             return make_out(self.game, req, msgs, err)
 

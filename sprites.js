@@ -328,8 +328,8 @@ const Art = (() => {
   ];
   const HERO = { hair: '#2a2030', shirt: '#d84848', pants: '#2a3a6a', cap: '#f0f0f0' };
   const NAMED = {
-    rival_1: { hair: '#e0a030', shirt: '#3a5ad0', pants: '#2a2a34' }, // ライバルのカナタ
-    rival: { hair: '#e0a030', shirt: '#3a5ad0', pants: '#2a2a34' },
+    rival_1: { hair: '#443a63', shirt: '#cc7845', pants: '#303c50' }, // ライバル仮置き：紫紺髪・夕色の上着
+    rival: { hair: '#443a63', shirt: '#cc7845', pants: '#303c50' },
     lab: { hair: '#d8d8d8', shirt: '#f4f4f8', pants: '#5a5a66' }, // 博士（白衣）
     heal: { hair: '#8a3a4a', shirt: '#f0a0b0', pants: '#f4f0f0', long: true },
     shop: { hair: '#4a3a2a', shirt: '#3a8ac8', pants: '#e8e0d0' },
@@ -340,8 +340,8 @@ const Art = (() => {
   // ラベル: 0=空 1=髪 2=肌 3=服(主色) 4=白目 5=瞳 6=濃い細部(靴/眉/口) 7=差し色 8=服(副色/ズボン) 9=差し色2(装飾)
   const BOSS_IDS = ['rival_1', 'boss_ishi', 'boss_mori', 'boss_minato'];
   const BOSS_SPEC = {
-    // ライバルのカナタ：元気な少年。スパイキーな紺髪、スポーティなジャケット、マフラー
-    rival_1: { skin: '#f4c49c', hair: '#232c4a', main: '#2a8a86', sub: '#eef0f0', accent: '#e0503a', accent2: '#b03024', dark: '#20222c', build: 'lean', hairStyle: 'spiky', pose: 'fistUp', extra: 'scarf' },
+    // ライバル仮置き：紫紺の短髪、夕色のジャケット、青緑のマフラー。既存のドット方式を維持。
+    rival_1: { skin: '#f4c49c', hair: '#443a63', main: '#cc7845', sub: '#303c50', accent: '#6cbab0', accent2: '#387f85', dark: '#252638', build: 'lean', hairStyle: 'short', pose: 'fistUp', extra: 'scarf' },
     // 石の道場主イワネ：大柄で頑丈な年配男性。灰茶の作務衣、鉢巻、石のお守り
     boss_ishi: { skin: '#c8a074', hair: '#6a6258', main: '#665a4a', sub: '#463c30', accent: '#9c3830', accent2: '#8a9a84', dark: '#241e16', build: 'heavy', hairStyle: 'short', pose: 'crossed', extra: 'amulet' },
     // 森の道場主コノハ：落ち着いた若い女性。長い緑髪と葉飾り、緑と土色の衣、小枝
